@@ -1,0 +1,38 @@
+# -
+#   type: bilibili #目前只支持2种rss链接或者b站
+#   matches: #匹配词，列表形式
+#   - 秘闻竞速
+#   keyword: 秘闻竞速 # 关键词
+#   number: 10 #默认10，最大10
+#   user: 40403050 #rss输入链接，b站输入uid
+#   option: #rss无视，b站使用可以指定内容 bvinfo:视频简介
+#   - bvinfo
+
+-
+  type: rss #目前只支持2种rss链接或者b站
+  matches: #匹配词，列表形式
+  - 更新公告
+  - 维护公告
+  - 公告
+  keyword: 维护更新公告 # 关键词
+  number: 10 #默认10，最大10
+  user:  https://rsshub.zzliux.cn/163/ds/5b00c224c7de46d98d33a6e0722ce28f #rss输入链接，b站输入uid
+
+-
+  type: rss #目前只支持2种rss链接或者b站
+  matches: #匹配词，列表形式
+  - 秘闻竞速
+  - 本周秘闻
+  - 本周竞速
+  keyword: 【秘闻副本】 # 关键词
+  number: 10 #默认10，最大10
+  user:  https://rsshub.zzliux.cn/163/ds/a9724e98c1cb4a4e931ebc3f467ea73d #rss输入链接，b站输入uid
+
+-
+  type: rss #目前只支持2种rss链接或者b站
+  matches: #匹配词，列表形式
+  - 活动阵容
+  - 活动攻略
+  keyword: 版本活动 # 关键词
+  number: 10 #默认10，最大10
+  user:  https://rsshub.zzliux.cn/163/ds/06fc2d8303dd4bdcbab84e0e2443dbc4 #rss输入链接，b站输入uid
