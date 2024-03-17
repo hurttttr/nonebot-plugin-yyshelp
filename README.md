@@ -10,3 +10,5 @@
 ## Documentation
 
 See [Docs](https://nonebot.dev/)
+
+需要安装的库：request,easyocr,pillow
