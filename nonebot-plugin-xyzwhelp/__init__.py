@@ -30,7 +30,6 @@ __plugin_meta__ = PluginMetadata(
 
 # global_config = get_driver().config
 # config = Config.parse_obj(global_config)
-reader_ch = easyocr.Reader(['ch_sim', 'en'], gpu=False)
 reader_en = easyocr.Reader(['en'], gpu=False)
 test = on_command("宝箱周")
 
@@ -59,7 +58,7 @@ async def process_image(bot: Bot,
             enhancer = ImageEnhance.Contrast(cut2)
             # 增强图像对比度
             cut2 = enhancer.enhance(2).save('cut2.jpg')
-            result1 = reader_ch.readtext('cut1.jpg', detail=0)
+            result1 = reader_en.readtext('cut1.jpg', detail=0)
             result2 = reader_en.readtext('cut2.jpg', detail=0)
             pre_code = int(
                 re.findall(r'\d+/\d+', result1[-1])[0].split('/')[0])
