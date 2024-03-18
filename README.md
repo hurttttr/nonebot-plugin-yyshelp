@@ -11,4 +11,10 @@
 
 See [Docs](https://nonebot.dev/)
 
-需要安装的库：request,easyocr,pillow
+需要安装的库：request,pillow
+
+目前使用的api国内无法访问，请自行解决，如果代理导致无法正常使用，请安装
+
+```shell
+.vnev/bin/pip3 install httpx[socks] requests[socks]
+```
