@@ -56,4 +56,4 @@ def calculate(wooden: int = 0,
         bout = 0
 
     # 返回计算结果
-    return f"木头箱子数量：{wooden} 银色箱子数量：{silver}\n金色箱子数量：{gold} 铂金箱子数量：{platinum}\n可完成轮数：{bout}\n当总积分：{code}\n完成下一轮还需：{surplus}\n需闯关：{surplus/2.5:.1f}\n请检查木头箱子数量是否正确，推荐选中钻石箱子再进行截图"
+    return f"木头箱子数量：{wooden:<4} 白银箱子数量：{silver:<4}\n黄金箱子数量：{gold:<4} 铂金箱子数量：{platinum:<4}\n可完成轮数：{bout}\n当总积分：{code}\n完成下一轮还需：{surplus}\n需闯关：{surplus/2.5:.1f}\n请检查木头箱子数量是否正确，推荐选中钻石箱子再进行截图"
