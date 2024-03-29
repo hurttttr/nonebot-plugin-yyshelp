@@ -24,7 +24,7 @@
   - 秘闻竞速
   - 本周秘闻
   - 本周竞速
-  keyword: 【秘闻副本】 # 关键词
+  keyword: 秘闻 # 关键词
   number: 10 #默认10，最大10
   user:  https://rsshub.zzliux.cn/163/ds/a9724e98c1cb4a4e931ebc3f467ea73d #rss输入链接，b站输入uid
 

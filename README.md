@@ -18,3 +18,5 @@ See [Docs](https://nonebot.dev/)
 ```shell
 .vnev/bin/pip3 install httpx[socks] requests[socks]
 ```
+
+xyzwhelp需配置中添加`xyzwhelp_apikey`在ocr.space自行申请，如果使用其他api自行 修改`utils/get.py`文件中的`ocr_space_file`函数

@@ -1,0 +1,11 @@
+-
+  deviceid: 'ec31b65b85164b53acc66d1d5c11471a'
+  token: 'ab16e647283c4e2fbe99f85202928d29'
+  uid: '0cfe4201bf4342e89b401c525398906c'
+  roleId: '5b6514be00291e06eebe4fe9'
+  server: '10025'
+  guildId: '60b22e5758342a3002a332b5'
+  cron: '5 21 0' #星期(1-7) 小时(0-23) 分钟
+  at: False
+  user_json: ""
+  qh: 940790485

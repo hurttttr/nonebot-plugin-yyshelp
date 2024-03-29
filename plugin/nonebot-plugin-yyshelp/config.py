@@ -1,5 +1,6 @@
 import json
 import yaml
+import os
 
 from nonebot.log import logger
 from nonebot import get_driver
@@ -20,6 +21,7 @@ from typing import (
 
 ALLOWED_SUFFIXES = (".json", ".yml", ".yaml")  #允许的文件后缀
 DATA_PATH = Path.cwd() / "data" / "yyshelp"  #配置存放路径
+
 #配置目录不存在自动创建
 if not DATA_PATH.exists():
     DATA_PATH.mkdir(parents=True)
@@ -48,6 +50,34 @@ class ReplyEntryModel(BaseModel):
     option: List[Literal["bvinfo"]] = [""]  #暂不使用
 
 
+class DailyWorkModel(BaseModel):
+    deviceid: str  #cookie
+    token: str  #cookie
+    uid: str  #大神id
+    roleId: str  #登录账户id
+    server: str  #服务器id
+    guildId: str  #寮id
+    cron: str = '0 0 21 * * 5 '  #默认每周521点执行
+    at: bool = False
+    user_json: str = ''  #json对应文件路径
+    qh: int
+
+    def get_headers(self) -> dict[str, str]:
+        return {
+            'User-Agent':
+            'Mozilla/5.0 (Linux; Android 12; 22021211RC Build/V417IR; wv) AppleWebKit/537.36 (KHTML, like Gecko) Version/4.0 Chrome/91.0.4472.114 Mobile Safari/537.36 Godlike/3.71.2 UEPay/com.netease.gl/android7.11.4',
+            'Accept': 'application/json, text/plain, */*',
+            # 'Accept-Encoding': 'gzip, deflate',
+            'Content-Type': 'application/json',
+            'gl-version': '3.71.2',
+            'gl-source': 'URS',
+            'gl-deviceid': self.deviceid,
+            'gl-token': self.token,
+            'gl-clienttype': '50',
+            'gl-uid': self.uid,
+        }
+
+
 def iter_config_path(root_path: Path = DATA_PATH) -> Iterator[Path]:
     """递归遍历指定目录下的所有文件，并返回符合条件的文件路径
 
@@ -65,7 +95,7 @@ def iter_config_path(root_path: Path = DATA_PATH) -> Iterator[Path]:
             yield path
 
 
-def load_config(path: Path) -> List[ReplyEntryModel]:
+def load_rss_config(path: Path) -> List[ReplyEntryModel]:
     """从指定路径加载配置文件，并将其转换为 ReplyEntryModel 对象的列表
 
     Args:
@@ -84,28 +114,24 @@ def load_config(path: Path) -> List[ReplyEntryModel]:
     return [ReplyEntryModel(**x) for x in obj]
 
 
-def reload_replies() -> Tuple[int, int]:
+def reload_rss() -> Tuple[int, int]:
     replies.clear()
 
     success = 0
     fail = 0
+    file_name = DATA_PATH / 'rss.yaml'
+    try:
+        replies.extend(load_rss_config(file_name))
 
-    for path in iter_config_path():
-        file_name = path.name
-        print(file_name)
+    except Exception:
+        logger.opt(colors=True).exception(
+            f"加载回复配置 <y>{file_name}</y> <l><r>失败</r></l>", )
+        fail += 1
 
-        try:
-            replies.extend(load_config(path))
-
-        except Exception:
-            logger.opt(colors=True).exception(
-                f"加载回复配置 <y>{file_name}</y> <l><r>失败</r></l>", )
-            fail += 1
-
-        else:
-            logger.opt(colors=True).info(
-                f"加载回复配置 <y>{file_name}</y> <l><g>成功</g></l>")
-            success += 1
+    else:
+        logger.opt(
+            colors=True).info(f"加载回复配置 <y>{file_name}</y> <l><g>成功</g></l>")
+        success += 1
 
     replies.sort(key=lambda x: x.priority)
     logger.opt(colors=True).info(
@@ -113,7 +139,38 @@ def reload_replies() -> Tuple[int, int]:
     return success, fail
 
 
+def reload_dailywork() -> bool:
+    """
+    重新加载每日工作配置。
+    
+    从指定的文件（支持 YAML 或 JSON 格式）中读取每日工作配置，并更新到 dailywork 的存储中。
+    不接受任何参数。
+    返回值为 None。
+    """
+    dailywork.clear()  # 清空当前的每日工作记录
+    file_name = DATA_PATH / 'dailywork.yaml'
+    print(file_name)  # 打印文件名
+
+    try:
+        content = file_name.read_text(encoding="u8")  # 读取文件内容
+
+        if file_name.suffix in (".yml", ".yaml"):  # 判断文件格式
+            # 加载 YAML 格式的内容
+            obj: list = yaml.load(content, Loader=yaml.FullLoader)
+        else:
+            # 加载 JSON 格式的内容
+            obj: list = json.loads(content)
+        # 将加载的内容转换为 DailyWorkModel 实例，并更新到 dailywork 中
+        dailywork.extend([DailyWorkModel(**x) for x in obj])
+        logger.opt(colors=True).info(f"<g>加载日常任务配置完毕</g>")
+    except Exception:
+        # 记录加载异常
+        logger.opt(colors=True).exception(f"<r>加载日常任务配置失败</r>")
+        return False
+    return True
+
+
+dailywork: List[DailyWorkModel] = []
 replies: List[ReplyEntryModel] = []
-reload_replies()
-# for i in replies:
-#     print(i)
+reload_rss()
+reload_dailywork()
