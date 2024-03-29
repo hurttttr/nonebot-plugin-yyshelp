@@ -219,7 +219,6 @@ async def zhougong_rule(
         if event.group_id == work.qh:
             zhougong.append(not_do_weekly(work))
             break
-    print(zhougong)
     state["zhougong"] = zhougong
     return bool(zhougong)
 
@@ -237,7 +236,7 @@ async def _(bot: Bot, event: Union[MessageEvent, PokeNotifyEvent],
     # 从会话状态中获取待回复的数据
     data: List[str] = state["zhougong"][0]
     if len(data) == 0:  # 如果待回复数据为空，则发送未查询到相关记录的消息
-        await Text("本周无人0周供！但也可能请求发送失败").finish()
+        await Text("本周无人0周贡！但也可能请求发送失败").finish()
     else:
         temp = '\n'.join(data)
         await Text(f"暗杀名单：\n{temp}").finish()
