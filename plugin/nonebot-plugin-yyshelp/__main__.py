@@ -58,7 +58,7 @@ async def message_checker(
     for reply in replies:
         if match_str(str(event.get_message()), reply.matches):  #进行回复词匹配
             state_reply.append(await get_rssdataList(reply.user,
-                                                     reply.keyword))
+                                                     reply.keyword,reply.number))
             break
 
     state["reply"] = state_reply
@@ -120,37 +120,6 @@ async def _(bot: Bot, event: Union[MessageEvent, PokeNotifyEvent],
 
 
 rss = on_command("rss", rule=to_me(), priority=10, block=True)
-
-
-@rss.handle()
-async def get_rss(args: Message = CommandArg()):
-    # 提取参数纯文本作为rss链接，并判断是否有效
-    if rss_link := args.extract_plain_text():
-        result = await get_rssdataList(rss_link, '秘闻竞速')
-        # logger.opt(colors=True).info(len(result))
-        if len(result) == 0:  #记录为0
-            await Text("未查询到相关记录！").finish()
-        elif len(result) == 1:  #记录为1
-            src_links = result[0].src_links
-            if len(src_links) == 0:  # 无图片
-                await Text(format(result[0])).finish()
-            elif len(src_links) > 1:  # 图片数>1
-                image_list = [Image(i) for i in src_links]
-                await Text(format(result[0])).send()
-                await AggregatedMessageFactory(image_list).finish()
-            else:  # 图片数==1
-                await Text(format(result[0])).send()
-                await Image(src_links[0]).finish()
-        else:  #记录大于1
-            msg_list: list[MessageFactory] = []
-            for i in result:
-                msg_list.append(
-                    MessageFactory([Text(format(i))] +
-                                   [Image(j) for j in i.src_links]))
-            await AggregatedMessageFactory(msg_list).finish()
-    else:
-        await Text("请输入要查询的rss链接").finish()
-
 
 reload_matcher = on_command("重载自动回复", permission=SUPERUSER)
 

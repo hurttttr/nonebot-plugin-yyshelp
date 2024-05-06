@@ -45,7 +45,7 @@ class ReplyEntryModel(BaseModel):
     priority: int = 1
     matches: List[str]
     keyword: str
-    number: int = 10
+    number: int = 5
     user: str
     option: List[Literal["bvinfo"]] = [""]  #暂不使用
 

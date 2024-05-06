@@ -22,7 +22,7 @@ class RssData:
         return f'@{self.author} {self.pubDate}\n{self.description}\n链接:{self.link}'
 
 
-async def get_rssdataList(url: str, keyword: str = '') -> list[RssData]:
+async def get_rssdataList(url: str, keyword: str = '',number:int = 5) -> list[RssData]:
     """获取rss中的作者信息和内容
 
     Args:
@@ -35,6 +35,9 @@ async def get_rssdataList(url: str, keyword: str = '') -> list[RssData]:
     author = root[0][0].text
     get_rssdataList = []
     for elem in root[0].iter(tag='item'):  #获取rss中item的内容
+        # 如果数字小于等于0，则跳出循环
+        if number <= 0:
+            break
         description = elem[1].text  #详细内容
         #当keyword非空且不为none的情况下判断内容是否包含
         if (keyword := keyword.strip()) and keyword not in description:
@@ -56,6 +59,7 @@ async def get_rssdataList(url: str, keyword: str = '') -> list[RssData]:
         result_dict = RssData(author, description, pubDate, link, href_links,
                               src_links)
         get_rssdataList.append(result_dict)
+        number -= 1
     return get_rssdataList
 
 
