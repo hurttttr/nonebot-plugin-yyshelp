@@ -39,7 +39,9 @@ nb plugin install nonebot-plugin-autoreply nonebot-bison nonebot-plugin-send-any
 
 <details>
 <summary>点击展开</summary>
-###  [2024/6/28] v1.0.0 机器人发布
-    - 完善项目说明
-</details>
 
+### [2024/6/28] v1.0.0 机器人发布
+
+- 完善项目说明
+
+</details>
