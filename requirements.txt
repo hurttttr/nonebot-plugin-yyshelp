@@ -1,3 +1,8 @@
+nonebot-plugin-autoreply
+nonebot-bison
+nonebot-plugin-send-anything-anywhere
+nonebot-plugin-naturel-gpt 
+nonebot_plugin_memes 
 pydantic~=1.10
 openai>=1.0
 requests
