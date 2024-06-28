@@ -1,10 +1,10 @@
-from nonebot.plugin import PluginMetadata
-from nonebot import require
+from nonebot.plugin import PluginMetadata, require
 
 require("nonebot_plugin_saa")
 
-from . import __main__ as __main__
 from nonebot_plugin_saa import enable_auto_select_bot
+
+from . import __main__ as __main__
 
 enable_auto_select_bot()
 __plugin_meta__ = PluginMetadata(

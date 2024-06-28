@@ -1,28 +1,16 @@
 import json
-import yaml
-import os
-
-from nonebot.log import logger
-from nonebot import get_driver
-from pydantic import BaseModel
 from pathlib import Path
-from typing import (
-    Any,
-    Dict,
-    Generic,
-    Iterator,
-    List,
-    Literal,
-    Optional,
-    Tuple,
-    TypeVar,
-    Union,
-)
+from typing import Iterator, List, Literal, Tuple
 
-ALLOWED_SUFFIXES = (".json", ".yml", ".yaml")  #允许的文件后缀
-DATA_PATH = Path.cwd() / "data" / "yyshelp"  #配置存放路径
+import yaml
+from nonebot import get_driver
+from nonebot.log import logger
+from pydantic import BaseModel
 
-#配置目录不存在自动创建
+ALLOWED_SUFFIXES = (".json", ".yml", ".yaml")  # 允许的文件后缀
+DATA_PATH = Path.cwd() / "data" / "yyshelp"  # 配置存放路径
+
+# 配置目录不存在自动创建
 if not DATA_PATH.exists():
     DATA_PATH.mkdir(parents=True)
 
@@ -33,6 +21,7 @@ class ConfigModel(BaseModel):
     Args:
         BaseModel (_type_): _description_
     """
+
     autoreply_block: bool = False
     autoreply_priority: int = 99
 
@@ -47,34 +36,33 @@ class ReplyEntryModel(BaseModel):
     keyword: str
     number: int = 5
     user: str
-    option: List[Literal["bvinfo"]] = [""]  #暂不使用
+    option: List[Literal["bvinfo"]] = [""]  # 暂不使用
 
 
 class DailyWorkModel(BaseModel):
-    deviceid: str  #cookie
-    token: str  #cookie
-    uid: str  #大神id
-    roleId: str  #登录账户id
-    server: str  #服务器id
-    guildId: str  #寮id
-    cron: str = '0 0 21 * * 5 '  #默认每周521点执行
+    deviceid: str  # cookie
+    token: str  # cookie
+    uid: str  # 大神id
+    roleId: str  # 登录账户id
+    server: str  # 服务器id
+    guildId: str  # 寮id
+    cron: str = "0 0 21 * * 5 "  # 默认每周521点执行
     at: bool = False
-    user_json: str = ''  #json对应文件路径
+    user_json: str = ""  # json对应文件路径
     qh: int
 
     def get_headers(self) -> dict[str, str]:
         return {
-            'User-Agent':
-            'Mozilla/5.0 (Linux; Android 12; 22021211RC Build/V417IR; wv) AppleWebKit/537.36 (KHTML, like Gecko) Version/4.0 Chrome/91.0.4472.114 Mobile Safari/537.36 Godlike/3.71.2 UEPay/com.netease.gl/android7.11.4',
-            'Accept': 'application/json, text/plain, */*',
+            "User-Agent": "Mozilla/5.0 (Linux; Android 12; 22021211RC Build/V417IR; wv) AppleWebKit/537.36 (KHTML, like Gecko) Version/4.0 Chrome/91.0.4472.114 Mobile Safari/537.36 Godlike/3.71.2 UEPay/com.netease.gl/android7.11.4",
+            "Accept": "application/json, text/plain, */*",
             # 'Accept-Encoding': 'gzip, deflate',
-            'Content-Type': 'application/json',
-            'gl-version': '3.71.2',
-            'gl-source': 'URS',
-            'gl-deviceid': self.deviceid,
-            'gl-token': self.token,
-            'gl-clienttype': '50',
-            'gl-uid': self.uid,
+            "Content-Type": "application/json",
+            "gl-version": "3.71.2",
+            "gl-source": "URS",
+            "gl-deviceid": self.deviceid,
+            "gl-token": self.token,
+            "gl-clienttype": "50",
+            "gl-uid": self.uid,
         }
 
 
@@ -119,36 +107,39 @@ def reload_rss() -> Tuple[int, int]:
 
     success = 0
     fail = 0
-    file_name = DATA_PATH / 'rss.yaml'
+    file_name = DATA_PATH / "rss.yaml"
     try:
         replies.extend(load_rss_config(file_name))
 
     except Exception:
         logger.opt(colors=True).exception(
-            f"加载回复配置 <y>{file_name}</y> <l><r>失败</r></l>", )
+            f"加载回复配置 <y>{file_name}</y> <l><r>失败</r></l>",
+        )
         fail += 1
 
     else:
-        logger.opt(
-            colors=True).info(f"加载回复配置 <y>{file_name}</y> <l><g>成功</g></l>")
+        logger.opt(colors=True).info(
+            f"加载回复配置 <y>{file_name}</y> <l><g>成功</g></l>"
+        )
         success += 1
 
     replies.sort(key=lambda x: x.priority)
     logger.opt(colors=True).info(
-        f"加载回复配置完毕，<l>成功 <g>{success}</g> 个，失败 <r>{fail}</r> 个</l>", )
+        f"加载回复配置完毕，<l>成功 <g>{success}</g> 个，失败 <r>{fail}</r> 个</l>",
+    )
     return success, fail
 
 
 def reload_dailywork() -> bool:
     """
     重新加载每日工作配置。
-    
+
     从指定的文件（支持 YAML 或 JSON 格式）中读取每日工作配置，并更新到 dailywork 的存储中。
     不接受任何参数。
     返回值为 None。
     """
     dailywork.clear()  # 清空当前的每日工作记录
-    file_name = DATA_PATH / 'dailywork.yaml'
+    file_name = DATA_PATH / "dailywork.yaml"
     print(file_name)  # 打印文件名
 
     try:
