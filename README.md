@@ -15,10 +15,10 @@
 
 ```
 nb plugin install nonebot-plugin-autoreply nonebot-bison nonebot-plugin-send-anything-anywhere nonebot-plugin-naturel-gpt  nonebot_plugin_memes 
-.vnev/bin/pip3 install httpx[socks] requests[socks]
-.vnev/bin/pip3 pip install --force-reinstall 'pydantic~=1.10' #降级
-.vnev/bin/pip3 pip install --upgrade 'openai>=1.0' #升级
-.vnev/bin/pip3 pip install requests pillow
+.venv/bin/pip install httpx[socks] requests[socks]
+.venv/bin/pip pip install --force-reinstall 'pydantic~=1.10' #降级
+.venv/bin/pip pip install --upgrade 'openai>=1.0' #升级
+.venv/bin/pip pip install requests pillow
 ```
 
 > 附带的咸鱼之王插件需配置中添加`xyzwhelp_apikey`在ocr.space自行申请，如果使用其他api自行 修改`utils/get.py`文件中的`ocr_space_file`函数
