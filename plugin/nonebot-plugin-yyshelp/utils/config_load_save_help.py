@@ -1,9 +1,9 @@
 import json
 import os
-from click import group
-from nonebot.log import logger
 
 import yaml
+from click import group
+from nonebot.log import logger
 from pydantic import BaseModel
 
 
@@ -66,6 +66,12 @@ def save_config(file_path: str, data_list: list) -> bool:
     if not data_list:
         logger.log("error", f"文件{file_path}数据为空")
         return False
+    # 判断文件路径是否存在
+    if not os.path.exists(os.path.dirname(file_path)):
+        # 获取父目录路径
+        parent_path = os.path.dirname(file_path)
+        # 创建父目录
+        os.makedirs(parent_path)
     # 判断文件是否存在，不存在则创建，存在则清空
     if not os.path.exists(file_path):
         with open(file_path, "w", encoding="utf-8") as f:
@@ -132,6 +138,6 @@ if __name__ == "__main__":
     print(data_list)
 
     # 尝试写入json文件
-    data_list.append(JsonTestModel(user_id=123, group_id=456,
-                     up_count=789, draw_count=114514))
-    save_config(file_path, data_list)
+    # data_list.append(JsonTestModel(user_id=123, group_id=456,
+    #                  up_count=789, draw_count=114514))
+    # save_config(file_path, data_list)

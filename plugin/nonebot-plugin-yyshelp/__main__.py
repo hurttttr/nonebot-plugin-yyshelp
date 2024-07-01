@@ -1,3 +1,4 @@
+from nonebot_plugin_apscheduler import scheduler
 from typing import List, Union
 
 from nonebot import on_command, on_message, on_notice, require
@@ -28,7 +29,6 @@ from .utils.rss import RssData, get_rssdataList
 
 require("nonebot_plugin_saa")
 require("nonebot_plugin_apscheduler")
-from nonebot_plugin_apscheduler import scheduler
 
 
 def match_str(word: str, match_list: List[str]) -> bool:
@@ -103,7 +103,8 @@ async def _(bot: Bot, event: Union[MessageEvent, PokeNotifyEvent], state: T_Stat
         for i in reply:
             # 对每条数据，创建包含文本和图片的消息工厂对象
             msg_list.append(
-                MessageFactory([Text(format(i))] + [Image(j) for j in i.src_links])
+                MessageFactory([Text(format(i))] + [Image(j)
+                               for j in i.src_links])
             )
         await AggregatedMessageFactory(msg_list).finish()
 
@@ -120,117 +121,117 @@ async def _():
     await Text(f"重载回复配置完毕~\n成功 {success} 个，失败 {fail} 个").finish()
 
 
-reload_dialywork_matcher = on_command("重载周贡查询", permission=SUPERUSER)
+# reload_dialywork_matcher = on_command("重载周贡查询", permission=SUPERUSER)
 
 
-@reload_dialywork_matcher.handle()
-async def _():
-    """重载周贡查询"""
-    if reload_dailywork():  # 重载成功
-        await Text("重载周贡查询成功").finish()
-    else:  # 重载失败
-        await Text("重载周贡查询失败").finish()
+# @reload_dialywork_matcher.handle()
+# async def _():
+#     """重载周贡查询"""
+#     if reload_dailywork():  # 重载成功
+#         await Text("重载周贡查询成功").finish()
+#     else:  # 重载失败
+#         await Text("重载周贡查询失败").finish()
 
 
-async def liao30_rule(
-    event: Union[MessageEvent, PokeNotifyEvent],
-    state: T_State,
-) -> bool:
-    if event.message_type != "group":
-        return False
-    liao30: list[str] = []
-    for work in dailywork:
-        if event.group_id == work.qh:
-            liao30.append(not_do_liao30(work))
-            break
-    state["liao30"] = liao30
-    return bool(liao30)
+# async def liao30_rule(
+#     event: Union[MessageEvent, PokeNotifyEvent],
+#     state: T_State,
+# ) -> bool:
+#     if event.message_type != "group":
+#         return False
+#     liao30: list[str] = []
+#     for work in dailywork:
+#         if event.group_id == work.qh:
+#             liao30.append(not_do_liao30(work))
+#             break
+#     state["liao30"] = liao30
+#     return bool(liao30)
 
 
-liao30 = on_command(
-    "今日30",
-    permission=SUPERUSER | GROUP_ADMIN | GROUP_OWNER,
-    rule=liao30_rule,
-    priority=10,
-    block=True,
-)
+# liao30 = on_command(
+#     "今日30",
+#     permission=SUPERUSER | GROUP_ADMIN | GROUP_OWNER,
+#     rule=liao30_rule,
+#     priority=10,
+#     block=True,
+# )
 
 
-@liao30.handle()
-async def _(bot: Bot, event: Union[MessageEvent, PokeNotifyEvent], state: T_State):
-    # 从会话状态中获取待回复的数据
-    data: List[str] = state["liao30"][0]
-    if len(data) == 0:  # 如果待回复数据为空，则发送未查询到相关记录的消息
-        await Text("全员已经完成寮30！但极有可能请求发送问题").finish()
-    else:
-        temp = "\n".join(data)
-        await Text(f"今日未完成名单：\n{temp}").finish()
+# @liao30.handle()
+# async def _(bot: Bot, event: Union[MessageEvent, PokeNotifyEvent], state: T_State):
+#     # 从会话状态中获取待回复的数据
+#     data: List[str] = state["liao30"][0]
+#     if len(data) == 0:  # 如果待回复数据为空，则发送未查询到相关记录的消息
+#         await Text("全员已经完成寮30！但极有可能请求发送问题").finish()
+#     else:
+#         temp = "\n".join(data)
+#         await Text(f"今日未完成名单：\n{temp}").finish()
 
 
-async def zhougong_rule(
-    event: Union[MessageEvent, PokeNotifyEvent],
-    state: T_State,
-) -> bool:
-    if event.message_type != "group":
-        return False
-    zhougong: list[str] = []
-    for work in dailywork:
-        if event.group_id == work.qh:
-            zhougong.append(not_do_weekly(work))
-            break
-    state["zhougong"] = zhougong
-    return bool(zhougong)
+# async def zhougong_rule(
+#     event: Union[MessageEvent, PokeNotifyEvent],
+#     state: T_State,
+# ) -> bool:
+#     if event.message_type != "group":
+#         return False
+#     zhougong: list[str] = []
+#     for work in dailywork:
+#         if event.group_id == work.qh:
+#             zhougong.append(not_do_weekly(work))
+#             break
+#     state["zhougong"] = zhougong
+#     return bool(zhougong)
 
 
-zhougong = on_command(
-    "周贡",
-    permission=SUPERUSER | GROUP_ADMIN | GROUP_OWNER,
-    rule=zhougong_rule,
-    priority=10,
-    block=True,
-)
+# zhougong = on_command(
+#     "周贡",
+#     permission=SUPERUSER | GROUP_ADMIN | GROUP_OWNER,
+#     rule=zhougong_rule,
+#     priority=10,
+#     block=True,
+# )
 
 
-@zhougong.handle()
-async def _(bot: Bot, event: Union[MessageEvent, PokeNotifyEvent], state: T_State):
-    # 从会话状态中获取待回复的数据
-    data: List[str] = state["zhougong"][0]
-    if len(data) == 0:  # 如果待回复数据为空，则发送未查询到相关记录的消息
-        await Text("本周无人0周贡！但也可能请求发送失败").finish()
-    else:
-        temp = "\n".join(data)
-        await Text(f"暗杀名单：\n{temp}").finish()
+# @zhougong.handle()
+# async def _(bot: Bot, event: Union[MessageEvent, PokeNotifyEvent], state: T_State):
+#     # 从会话状态中获取待回复的数据
+#     data: List[str] = state["zhougong"][0]
+#     if len(data) == 0:  # 如果待回复数据为空，则发送未查询到相关记录的消息
+#         await Text("本周无人0周贡！但也可能请求发送失败").finish()
+#     else:
+#         temp = "\n".join(data)
+#         await Text(f"暗杀名单：\n{temp}").finish()
 
 
-async def run_every_week(arg1: DailyWorkModel):
-    """
-    每周执行一次的任务函数，用于向指定QQ群发送本周的“0周任务”完成情况。
+# async def run_every_week(arg1: DailyWorkModel):
+#     """
+#     每周执行一次的任务函数，用于向指定QQ群发送本周的“0周任务”完成情况。
 
-    参数:
-    arg1: DailyWorkModel - 包含与“0周任务”相关的信息模型对象，例如执行人员和任务内容等。
+#     参数:
+#     arg1: DailyWorkModel - 包含与“0周任务”相关的信息模型对象，例如执行人员和任务内容等。
 
-    返回值:
-    无返回值，但会异步向指定的QQ群发送文本消息。
-    """
-    # 初始化目标QQ群对象
-    target = TargetQQGroup(group_id=arg1.qh)
-    # 获取本周周供为0人员名单
-    data: str = not_do_weekly(arg1)
-    if len(data) == 0:
-        await Text("本周无人0周供！但也可能请求发送失败").send_to(target)
-    else:
-        await Text("暗杀名单：\n%s" % "\n".join(data)).send_to(target)
+#     返回值:
+#     无返回值，但会异步向指定的QQ群发送文本消息。
+#     """
+#     # 初始化目标QQ群对象
+#     target = TargetQQGroup(group_id=arg1.qh)
+#     # 获取本周周供为0人员名单
+#     data: str = not_do_weekly(arg1)
+#     if len(data) == 0:
+#         await Text("本周无人0周供！但也可能请求发送失败").send_to(target)
+#     else:
+#         await Text("暗杀名单：\n%s" % "\n".join(data)).send_to(target)
 
 
-for i in dailywork:
-    time = i.cron.split(" ")
-    scheduler.add_job(
-        run_every_week,
-        "cron",
-        day_of_week=int(time[0]) - 1,
-        hour=time[1],
-        minute=time[2],
-        id=i.guildId,
-        args=[i],
-    )
-    logger.opt(colors=True).info(f"<l><g>{i.qh}</g></l> 定时任务加载完成")
+# for i in dailywork:
+#     time = i.cron.split(" ")
+#     scheduler.add_job(
+#         run_every_week,
+#         "cron",
+#         day_of_week=int(time[0]) - 1,
+#         hour=time[1],
+#         minute=time[2],
+#         id=i.guildId,
+#         args=[i],
+#     )
+#     logger.opt(colors=True).info(f"<l><g>{i.qh}</g></l> 定时任务加载完成")

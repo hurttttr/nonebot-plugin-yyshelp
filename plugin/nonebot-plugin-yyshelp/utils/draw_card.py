@@ -75,23 +75,23 @@ def get_or_update_icon() -> list[Heros]:
         # 判断文件夹是否存在
         if not os.path.exists(path + value):
             os.makedirs(path + value)  # 递归创建文件夹
-            url = f"https://g37simulator.webapp.163.com/get_heroid_list?callback=jQuery1113002988038468302756_1719390741330&rarity={
-                key}&interactive=0&material_type=0&page=1&per_page=200"
+            url = f"""https://g37simulator.webapp.163.com/get_heroid_list?callback=jQuery1113002988038468302756_1719390741330&rarity={
+                key}&interactive=0&material_type=0&page=1&per_page=200"""
             response = requests.get(url, headers=headers, timeout=10)
             data = json.loads(response.text[43:-1])["data"]
 
             for heroid in data:
                 # print(heroid, data[heroid]['name'])
-                icon_url = f"https://yys.res.netease.com/pc/zt/20161108171335/data/shishen/{
-                    heroid}.png?v5"
+                icon_url = f"""https://yys.res.netease.com/pc/zt/20161108171335/data/shishen/{
+                    heroid}.png?v5"""
                 response = requests.get(icon_url, headers=headers, timeout=10)
                 heros_list.append(Heros(heroid, data[heroid]["name"], value))
                 with open(f"icon/{value}/{heroid}.png", "wb") as f:
                     f.write(response.content)
         # 若存在则判断是否有更新
         else:
-            url = f"https://g37simulator.webapp.163.com/get_heroid_list?callback=jQuery1113002988038468302756_1719390741330&rarity={
-                key}&interactive=0&material_type=0&page=1&per_page=200"
+            url = f"""https://g37simulator.webapp.163.com/get_heroid_list?callback=jQuery1113002988038468302756_1719390741330&rarity={
+                key}&interactive=0&material_type=0&page=1&per_page=200"""
             response = requests.get(url, headers=headers, timeout=10)
             data = json.loads(response.text[43:-1])["data"]
 
@@ -103,8 +103,8 @@ def get_or_update_icon() -> list[Heros]:
                     # 打印新增式神的提示信息
                     print(f"新增{value}式神{data[heroid]['name']}，ID:{heroid}")
                     # 构造图标URL
-                    icon_url = f"https://yys.res.netease.com/pc/zt/20161108171335/data/shishen/{
-                        heroid}.png?v5"
+                    icon_url = f"""https://yys.res.netease.com/pc/zt/20161108171335/data/shishen/{
+                        heroid}.png?v5"""
                     # 发送HTTP GET请求获取图标
                     response = requests.get(
                         icon_url, headers=headers, timeout=10)
