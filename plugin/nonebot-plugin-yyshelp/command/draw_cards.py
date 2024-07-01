@@ -28,10 +28,11 @@ draw = on_command("抽卡", block=True)
 @draw.handle()
 async def _(event: Union[MessageEvent, PokeNotifyEvent]):
     # 判断群号是否在黑名单中
-    if event.group_id in [12345678, 987654321]:
+    if event.get_type() == "group" and event.group_id in [12345678, 987654321]:
         return
     # 随机抽取一张卡片
-    result, up_count = simulate_draw(heros_dict, heros_up_id, up_count, draw_count)
+    result, up_count = simulate_draw(
+        heros_dict, heros_up_id, up_count, draw_count)
     # 将结果转换为字符串
     result_str = ""
     for hero_id in result:
