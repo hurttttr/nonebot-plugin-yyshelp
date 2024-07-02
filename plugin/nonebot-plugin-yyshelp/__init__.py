@@ -4,7 +4,7 @@ from nonebot.plugin import PluginMetadata, require
 from nonebot_plugin_saa import enable_auto_select_bot
 
 from . import __main__ as __main__
-from .command.draw_cards import DRAW_PATH, draw_init, user_list
+from .entities.draw_cards import DRAW_PATH, draw_init, user_list
 from .utils.config_load_save_help import save_config
 
 require("nonebot_plugin_saa")

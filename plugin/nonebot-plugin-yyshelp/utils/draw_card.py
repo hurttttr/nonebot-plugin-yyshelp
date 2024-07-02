@@ -1,8 +1,13 @@
 import json
 import os
 import random
+from re import T
+from turtle import up
+from typing import Dict, List, Tuple
 
 import requests
+
+from ..classes.draw_card_class import Heros, DrawCardUser
 
 # 稀有度字典
 rarity = {
@@ -32,16 +37,6 @@ headers = {
 path = 'data/icon/'
 
 
-class Heros:
-    def __init__(self, heroid, name, rarity):
-        self.heroid = heroid
-        self.name = name
-        self.rarity = rarity
-
-    def __str__(self):
-        return self.name
-
-
 # 转换函数，输入列表，输出按照稀有度分类的字典
 def list_to_dict(heros_list: list[Heros]) -> dict:
     result: dict = {"n": [], "r": [], "sr": [], "ssr": [], "sp": []}
@@ -57,11 +52,11 @@ def list_to_dict(heros_list: list[Heros]) -> dict:
 def generate_id_name_dict(heros_list: list[Heros]) -> dict:
     result = {}
     for i in heros_list:
-        result[i.heroid] = i.name
+        result[i.heroid] = [i.name, i.rarity]
     return result
 
 
-def get_or_update_icon() -> list[Heros]:
+def get_or_update_icon() -> Tuple[list[Heros], str]:
     """
     获取或更新英雄图标。
 
@@ -71,6 +66,7 @@ def get_or_update_icon() -> list[Heros]:
     :return: list, 包含英雄对象的列表。
     """
     heros_list = []
+    update_text = ""
     for key, value in rarity.items():
         # 判断文件夹是否存在
         if not os.path.exists(path + value):
@@ -101,7 +97,8 @@ def get_or_update_icon() -> list[Heros]:
                 # 检查指定路径下是否存在该式神的图标文件
                 if not os.path.exists(path+f"{value}/{heroid}.png"):
                     # 打印新增式神的提示信息
-                    print(f"新增{value}式神{data[heroid]['name']}，ID:{heroid}")
+                    update_text += f"""新增{value}
+                        式神{data[heroid]['name']}，ID:{heroid}\n"""
                     # 构造图标URL
                     icon_url = f"""https://yys.res.netease.com/pc/zt/20161108171335/data/shishen/{
                         heroid}.png?v5"""
@@ -111,13 +108,12 @@ def get_or_update_icon() -> list[Heros]:
                     # 将获取的图标保存到指定路径
                     with open(path+f"{value}/{heroid}.png", "wb") as f:
                         f.write(response.content)
-    return heros_list
+    return heros_list, update_text
 
 
 # 根据概率进行模拟抽卡，输入式神字典、当期up式神id、累计up次数和累计抽卡次数，输出10次抽卡结果,结果列表中包含式神id
 def simulate_draw(
-    heros_dict: dict, heros_up_id: str, up_count: int, draw_count: int
-) -> tuple[list[str], int]:
+        heros_dict: dict, heros_up_id: str, user: DrawCardUser) -> list[str]:
     """
     模拟抽卡。
 
@@ -125,14 +121,14 @@ def simulate_draw(
 
     :param heros_dict: dict, 包含式神字典。
     :param heros_up_id: int, 当期up式神id。
-    :param up_count: int, 累计up次数。
-    :param draw_count: int, 累计抽卡次数。
-    :return: tuple, 包含10次抽卡结果的列表和累计up次数。
+    :param user: User, 用户对象。
+    :return: list, 10次抽卡结果,结果列表中包含式神id。
+
     """
     result = []
     for i in range(10):
         # 如果up次数达到六十，则必出ssp或sp
-        if up_count >= 59:
+        if user.up_count >= 59:
             random_num = round(random.uniform(98.75, 100), 2)
         else:
             # 生成0-100的含2位小数的随机数
@@ -148,23 +144,28 @@ def simulate_draw(
             rarity_key = "sp"
         # 若随机数小于98.75，则累计up次数加1
         if random_num < 98.75:
-            up_count += 1
+            user.up_count += 1
         else:
-            up_count = 0
-        # 若抽卡次数在450内，且该次抽中ssr或者sp式神，在此进行随机判断，若随机数小于10+抽卡次数/50*10，则必出up式神
+            user.up_count = 0
+        # 若该用户还未获取up式神，且累计抽卡次数在450内，且该次抽中ssr或者sp式神，在此进行随机判断，若随机数小于10+抽卡次数/50*10，则必出up式神
         if (
-            draw_count <= 450
+            user.get_up_count == 0
+            and user.draw_count <= 450
             and random_num >= 98.75
-            and random.uniform(0, 100) < (10 + (draw_count // 50 * 10))
+            and random.uniform(0, 100) < (10 + (user.draw_count // 50 * 10))
         ):
             result.append(heros_up_id)
+            user.get_up_count = user.draw_count+i+1
         else:
             # 否则随机选取该稀有度下所有式神
-            heros_list = heros_dict[rarity_key]
+            heros_list: list[Heros] = heros_dict[rarity_key]
             # 随机选取一个式神
             heros_id = random.choice(heros_list).heroid
+            # 如果为up式神，写入获得up式神次数
+            if heros_id == heros_up_id:
+                user.get_up_count = user.draw_count+i+1
             result.append(heros_id)
-    return result, up_count
+    return result
 
 
 if __name__ == "__main__":
