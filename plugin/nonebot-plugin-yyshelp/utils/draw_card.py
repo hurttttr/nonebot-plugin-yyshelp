@@ -92,7 +92,7 @@ def get_or_update_icon() -> Tuple[list[Heros], str]:
                     heroid}.png?v5"""
                 response = requests.get(icon_url, headers=headers, timeout=10)
                 heros_list.append(Heros(heroid, data[heroid]["name"], value))
-                with open(f"icon/{value}/{heroid}.png", "wb") as f:
+                with open(path+f"{value}/{heroid}.png", "wb") as f:
                     f.write(response.content)
         # 若存在则判断是否有更新
         else:
