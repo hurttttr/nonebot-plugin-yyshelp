@@ -1,4 +1,3 @@
-from nonebot_plugin_apscheduler import scheduler
 from typing import List, Union
 
 from nonebot import on_command, on_message, on_notice, require
@@ -8,6 +7,7 @@ from nonebot.log import logger
 from nonebot.permission import SUPERUSER
 from nonebot.rule import to_me
 from nonebot.typing import T_State
+from nonebot_plugin_apscheduler import scheduler
 from nonebot_plugin_saa import (
     AggregatedMessageFactory,
     Image,
@@ -103,8 +103,7 @@ async def _(bot: Bot, event: Union[MessageEvent, PokeNotifyEvent], state: T_Stat
         for i in reply:
             # 对每条数据，创建包含文本和图片的消息工厂对象
             msg_list.append(
-                MessageFactory([Text(format(i))] + [Image(j)
-                               for j in i.src_links])
+                MessageFactory([Text(format(i))] + [Image(j) for j in i.src_links])
             )
         await AggregatedMessageFactory(msg_list).finish()
 
@@ -119,6 +118,21 @@ async def _():
     """重载自动回复"""
     success, fail = reload_rss()
     await Text(f"重载回复配置完毕~\n成功 {success} 个，失败 {fail} 个").finish()
+
+
+broadcast = on_command("广播", aliases={"bc"}, permission=SUPERUSER)
+
+
+@broadcast.handle()
+async def _(bot: Bot, event: PrivateMessageEvent, arg: Message = CommandArg()) -> None:
+    msg = arg.extract_plain_text().strip()
+    if not msg:
+        await bot.send_private_msg(
+            user_id=event.user_id, message="请在指令后接需要广播的消息"
+        )
+    group_list = await bot.get_group_list()
+    for group in group_list:
+        await bot.send_group_msg(group_id=group["group_id"], message=msg)
 
 
 # reload_dialywork_matcher = on_command("重载周贡查询", permission=SUPERUSER)
