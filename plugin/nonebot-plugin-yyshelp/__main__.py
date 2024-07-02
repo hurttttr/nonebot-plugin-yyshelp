@@ -1,9 +1,16 @@
 from typing import List, Union
 
 from nonebot import on_command, on_message, on_notice, require
-from nonebot.adapters.onebot.v11 import Bot, MessageEvent, PokeNotifyEvent
+from nonebot.adapters import Message
+from nonebot.adapters.onebot.v11 import (
+    Bot,
+    MessageEvent,
+    PokeNotifyEvent,
+    PrivateMessageEvent,
+)
 from nonebot.adapters.onebot.v11.permission import GROUP_ADMIN, GROUP_OWNER
 from nonebot.log import logger
+from nonebot.params import CommandArg
 from nonebot.permission import SUPERUSER
 from nonebot.rule import to_me
 from nonebot.typing import T_State
@@ -124,7 +131,7 @@ broadcast = on_command("广播", aliases={"bc"}, permission=SUPERUSER)
 
 
 @broadcast.handle()
-async def _(bot: Bot, event: PrivateMessageEvent, arg: Message = CommandArg()) -> None:
+async def _(bot: Bot,event: PrivateMessageEvent,arg: Message = CommandArg()) -> None:
     msg = arg.extract_plain_text().strip()
     if not msg:
         await bot.send_private_msg(
