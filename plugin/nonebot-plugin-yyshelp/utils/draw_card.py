@@ -1,13 +1,11 @@
 import json
 import os
 import random
-from re import T
-from turtle import up
 from typing import Dict, List, Tuple
 
 import requests
 
-from ..classes.draw_card_class import Heros, DrawCardUser
+from ..classes.draw_card_class import DrawCardUser, Heros
 
 # 稀有度字典
 rarity = {
@@ -34,11 +32,17 @@ headers = {
     "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/87.0.4280.88 Safari/537.36"
 }
 
-path = 'data/icon/'
+path = "data/icon/"
 
 
 # 转换函数，输入列表，输出按照稀有度分类的字典
-def list_to_dict(heros_list: list[Heros]) -> dict:
+def list_to_dict(heros_list: list[Heros]) -> Dict[str, list[Heros]]:
+    """
+    转换函数，输入列表，输出按照稀有度分类的字典。
+
+    :param heros_list: list, 包含英雄对象的列表。
+    :return: Dict, 包含按照稀有度分类的英雄对象的字典。
+    """
     result: dict = {"n": [], "r": [], "sr": [], "ssr": [], "sp": []}
     for i in heros_list:
         # 去掉无法抽到的式神
@@ -50,6 +54,12 @@ def list_to_dict(heros_list: list[Heros]) -> dict:
 
 # 生成id与名称的映射字典
 def generate_id_name_dict(heros_list: list[Heros]) -> dict:
+    """
+    生成id与名称的映射字典。
+
+    :param heros_list: list, 包含英雄对象的列表。
+    :return: dict, 包含id与名称的映射字典，格式为{id: [name, rarity]}。
+    """
     result = {}
     for i in heros_list:
         result[i.heroid] = [i.name, i.rarity]
@@ -95,7 +105,7 @@ def get_or_update_icon() -> Tuple[list[Heros], str]:
             for heroid in data:
                 heros_list.append(Heros(heroid, data[heroid]["name"], value))
                 # 检查指定路径下是否存在该式神的图标文件
-                if not os.path.exists(path+f"{value}/{heroid}.png"):
+                if not os.path.exists(path + f"{value}/{heroid}.png"):
                     # 打印新增式神的提示信息
                     update_text += f"""新增{value}
                         式神{data[heroid]['name']}，ID:{heroid}\n"""
@@ -103,17 +113,15 @@ def get_or_update_icon() -> Tuple[list[Heros], str]:
                     icon_url = f"""https://yys.res.netease.com/pc/zt/20161108171335/data/shishen/{
                         heroid}.png?v5"""
                     # 发送HTTP GET请求获取图标
-                    response = requests.get(
-                        icon_url, headers=headers, timeout=10)
+                    response = requests.get(icon_url, headers=headers, timeout=10)
                     # 将获取的图标保存到指定路径
-                    with open(path+f"{value}/{heroid}.png", "wb") as f:
+                    with open(path + f"{value}/{heroid}.png", "wb") as f:
                         f.write(response.content)
     return heros_list, update_text
 
 
 # 根据概率进行模拟抽卡，输入式神字典、当期up式神id、累计up次数和累计抽卡次数，输出10次抽卡结果,结果列表中包含式神id
-def simulate_draw(
-        heros_dict: dict, heros_up_id: str, user: DrawCardUser) -> list[str]:
+def simulate_draw(heros_dict: dict, heros_up_id: str, user: DrawCardUser) -> list[str]:
     """
     模拟抽卡。
 
@@ -155,7 +163,7 @@ def simulate_draw(
             and random.uniform(0, 100) < (10 + (user.draw_count // 50 * 10))
         ):
             result.append(heros_up_id)
-            user.get_up_count = user.draw_count+i+1
+            user.get_up_count = user.draw_count + i + 1
         else:
             # 否则随机选取该稀有度下所有式神
             heros_list: list[Heros] = heros_dict[rarity_key]
@@ -163,7 +171,7 @@ def simulate_draw(
             heros_id = random.choice(heros_list).heroid
             # 如果为up式神，写入获得up式神次数
             if heros_id == heros_up_id:
-                user.get_up_count = user.draw_count+i+1
+                user.get_up_count = user.draw_count + i + 1
             result.append(heros_id)
     return result
 
@@ -175,8 +183,7 @@ if __name__ == "__main__":
     heros_up_id = "315"
     draw_count = 440
     up_count = 50
-    result, up_count = simulate_draw(
-        heros_dict, heros_up_id, up_count, draw_count)
+    result, up_count = simulate_draw(heros_dict, heros_up_id, up_count, draw_count)
     print(result, up_count)
     if len(result) == 1:
         print(result[0])

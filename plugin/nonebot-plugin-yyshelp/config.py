@@ -8,12 +8,11 @@ from nonebot import get_driver
 from nonebot.log import logger
 from pydantic import BaseModel
 
-
 from .utils.config_load_save_help import load_config, save_config
 
 ALLOWED_SUFFIXES = (".json", ".yml", ".yaml")  # 允许的文件后缀
 DATA_PATH = Path.cwd() / "data" / "yyshelp"  # 配置存放路径
-Config_PATH = r'config/yyshelp.yaml'  # 配置文件路径
+CONFIG_PATH = r"config/yyshelp.yaml"  # 配置文件路径
 
 # 配置目录不存在自动创建
 if not DATA_PATH.exists():
@@ -36,10 +35,10 @@ class YYSHelpConfig(BaseModel):
 
 
 # 读取配置文件，若不存在则创建
-if not os.path.exists(Config_PATH):
-    save_config(Config_PATH, [YYSHelpConfig()])
+if not os.path.exists(CONFIG_PATH):
+    save_config(CONFIG_PATH, [YYSHelpConfig()])
 templist = []
-load_config(YYSHelpConfig, Config_PATH, templist)
+load_config(YYSHelpConfig, CONFIG_PATH, templist)
 yyshelp_config = templist[0]
 
 
