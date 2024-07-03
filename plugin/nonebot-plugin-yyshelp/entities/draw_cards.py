@@ -80,8 +80,8 @@ async def _(event: Union[MessageEvent, PokeNotifyEvent]):
         send_text = f"""当期up：{id_name_dict[yyshelp_config.draw_card_up_id][0]}\n{user.up_count}/60 内必出ssr/sp up概率：{10 + (
             (user.draw_count-10)//50)*10}\n抽卡结果：\n{result_str}\n当前累计抽卡{user.draw_count}次"""
 
-    # 发送结果
-    await draw.send(send_text)
+    # 发送结果,并@发送者
+    await Text(send_text).send(at_sender=True)
 
 
 @on_command("抽卡帮助", block=True).handle()
@@ -115,7 +115,7 @@ async def _(event: Union[MessageEvent, PokeNotifyEvent]):
 
 
 @on_command("抽卡更新", block=True, permission=SUPERUSER).handle()
-async def _(event: Union[MessageEvent, PokeNotifyEvent]):
+async def _(bot: Bot, event: Union[MessageEvent, PokeNotifyEvent]):
     global heros_list, heros_dict, id_name_dict, user_list
     heros_list, update_text = get_or_update_icon()
     heros_dict = list_to_dict(heros_list)
@@ -125,9 +125,18 @@ async def _(event: Union[MessageEvent, PokeNotifyEvent]):
     else:
         heros_list.sort(key=lambda x: x.heroid, reverse=True)
         yyshelp_config.draw_card_up_id = heros_list[0].heroid
-        await Text(
-            f"更新式神\n{update_text}\n当前up：{id_name_dict[yyshelp_config.draw_card_up_id][0]}"
-        ).send()
+        # 重置抽卡记录
+        for user in user_list:
+            user.up_count = 0
+            user.draw_count = 0
+            user.get_up_count = 0
+        # 保存抽卡记录
+        save_config(CONFIG_PATH, [yyshelp_config])
+        update_text = f"""更新式神\n{update_text}\n当前up：{id_name_dict[yyshelp_config.draw_card_up_id][0]}\n已重置抽卡次数"""
+        # 发送更新信息
+        group_list = await bot.get_group_list()
+        for group in group_list:
+            await bot.send_group_msg(group_id=group["group_id"], message=update_text)
 
 
 @on_command("抽卡UP", block=True, permission=SUPERUSER).handle()
@@ -138,5 +147,5 @@ async def _(args: Message = CommandArg()):
         await Text("请输入正确的式神id").send(at_sender=True)
     else:
         yyshelp_config.draw_card_up_id = up_id
-        save_config(CONFIG_PATH,[yyshelp_config])
+        save_config(CONFIG_PATH, [yyshelp_config])
         await Text(f"已设置当前up：{id_name_dict[up_id][0]}").send(at_sender=True)
