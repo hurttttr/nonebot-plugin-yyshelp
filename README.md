@@ -29,7 +29,13 @@ nb plugin install nonebot-plugin-autoreply nonebot-bison nonebot-plugin-send-any
 > 以下未勾选功能仅表示未来可能开发的方向，不代表实际规划进度，具体开发事项可能随时变动
 > 勾选: 已实现功能；未勾选: 正在开发 / 计划开发 / 待定设计
 
-- [ ] 消息推送
+- [x] 消息推送
+  - [ ] 重构功能
+  - [ ] 实现在线更新
+
+- [x] 模拟抽卡
+  - [ ] 抽卡图片生成
+
 
 ## 📄 使用文档
 
@@ -39,6 +45,10 @@ nb plugin install nonebot-plugin-autoreply nonebot-bison nonebot-plugin-send-any
 
 <details>
 <summary>点击展开</summary>
+### [2024/7/3] v1.1.0 抽卡模块上线
+
+- 抽卡功能实现
+- 确定项目整体结构
 
 ### [2024/6/28] v1.0.0 机器人发布
 
