@@ -15,14 +15,15 @@
 
 ```
 nb plugin install nonebot-plugin-autoreply nonebot-bison nonebot-plugin-send-anything-anywhere nonebot-plugin-naturel-gpt  nonebot_plugin_memes 
-.venv/bin/pip install httpx[socks] requests[socks]
-.venv/bin/pip pip install --force-reinstall 'pydantic~=1.10' #降级
-.venv/bin/pip pip install --upgrade 'openai>=1.0' #升级
-.venv/bin/pip pip install requests pillow
+.venv/bin/python -m pip install httpx[socks] requests[socks]
+.venv/bin/python -m pip install --force-reinstall 'pydantic~=1.10' #降级
+.venv/bin/python -m pip install --upgrade 'openai>=1.0' #升级
+.venv/bin/python -m pip install requests pillow
 ```
 
 > 附带的咸鱼之王插件需配置中添加`xyzwhelp_apikey`在ocr.space自行申请，如果使用其他api自行 修改`utils/get.py`文件中的`ocr_space_file`函数
 >
+> 注：Python>=3.10使用requests请求https请求有问题，需执行`pip install urllib3==1.26.5`
 
 ## 💡 功能列表
 
@@ -35,11 +36,25 @@ nb plugin install nonebot-plugin-autoreply nonebot-bison nonebot-plugin-send-any
 
 - [x] 模拟抽卡
   - [ ] 抽卡图片生成
+- [ ] 寮三十查询
+  - [ ] 完善cookie获取方式（希望有大佬帮助）
+
 
 
 ## 📄 使用文档
 
 尚在制作中~
+
+## ✏️开发环境
+
+> 推荐使用vscode，安装Black Formatter+Pylint+isort
+>
+> 配置过程参考：[在VSCode中编写python代码，代码规范工具介绍与推荐](https://blog.csdn.net/shiwanghualuo/article/details/131750278)
+
+```shell
+#开发环境,有版本冲突请提issue
+pip install -r development.txt
+```
 
 ## 🎢 更新日志
 

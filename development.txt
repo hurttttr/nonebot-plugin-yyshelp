@@ -1,0 +1,7 @@
+nonebot2
+nonebot-plugin-send-anything-anywhere
+nonebot_plugin_apscheduler
+nonebot-adapter-onebot
+pillow
+requests
+httpx
