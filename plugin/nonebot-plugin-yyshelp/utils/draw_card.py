@@ -92,7 +92,7 @@ def get_or_update_icon() -> Tuple[list[Heros], str]:
                     heroid}.png?v5"""
                 response = requests.get(icon_url, headers=headers, timeout=10)
                 heros_list.append(Heros(heroid, data[heroid]["name"], value))
-                with open(path+f"{value}/{heroid}.png", "wb") as f:
+                with open(path + f"{value}/{heroid}.png", "wb") as f:
                     f.write(response.content)
         # 若存在则判断是否有更新
         else:
@@ -107,8 +107,9 @@ def get_or_update_icon() -> Tuple[list[Heros], str]:
                 # 检查指定路径下是否存在该式神的图标文件
                 if not os.path.exists(path + f"{value}/{heroid}.png"):
                     # 打印新增式神的提示信息
-                    update_text += f"""新增{value}
-                        式神{data[heroid]['name']}，ID:{heroid}\n"""
+                    update_text += (
+                        f"新增{value}式神{data[heroid]['name']}，ID:{heroid}\n"
+                    )
                     # 构造图标URL
                     icon_url = f"""https://yys.res.netease.com/pc/zt/20161108171335/data/shishen/{
                         heroid}.png?v5"""

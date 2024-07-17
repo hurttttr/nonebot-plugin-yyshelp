@@ -34,7 +34,7 @@ def draw_init():
     logger.info("抽卡模块加载")
     global heros_list, heros_dict, id_name_dict, user_list
     heros_list, update_text = get_or_update_icon()
-    if len(heros_list) == 0:
+    if len(update_text) == 0:
         logger.info("无式神更新")
     else:
         logger.info(f"更新式神\n{update_text}")
@@ -149,3 +149,19 @@ async def _(args: Message = CommandArg()):
         yyshelp_config.draw_card_up_id = up_id
         save_config(CONFIG_PATH, [yyshelp_config])
         await Text(f"已设置当前up：{id_name_dict[up_id][0]}").send(at_sender=True)
+
+
+@on_command("抽卡重置", block=True, permission=SUPERUSER).handle()
+async def _(bot: Bot):
+    # 重置抽卡记录
+    for user in user_list:
+        user.up_count = 0
+        user.draw_count = 0
+        user.get_up_count = 0
+    # 保存抽卡记录
+    save_config(CONFIG_PATH, [yyshelp_config])
+    message = "已重置抽卡次数"
+    # 发送更新信息
+    group_list = await bot.get_group_list()
+    for group in group_list:
+        await bot.send_group_msg(group_id=group["group_id"], message=message)
