@@ -23,8 +23,10 @@ async def process_image(bot: Bot, event: MessageEvent, msg: Message = Arg("tu"))
         if msg[0].type == "image":
             await bot.send(event=event, message="正在处理图片")
             url = msg[0].data["url"]  # 图片链接
-            print(url)
-            get_image_and_cut(url)
-            await bot.send(event=event, message=get_return_str())
+            try:
+                get_image_and_cut(url)
+                await bot.send(event=event, message=get_return_str())
+            except Exception as e:
+                await bot.send(event=event, message=f"处理失败，错误信息：{e}")
     except IndexError:
         await bot.finish("参数错误")
