@@ -103,7 +103,7 @@ async def _(event: Union[MessageEvent, PokeNotifyEvent]):
         user = user_list[user_list.index(event.user_id)]
         if user.get_up_count > 0:
             send_text = f"""抽卡记录：\n当前累计抽卡{
-                user.draw_count}次\n本期up{user.up_count}次抽出"""
+                user.draw_count}次\n本期up{user.get_up_count}次抽出"""
         else:
             send_text = (
                 f"""抽卡记录：\n当前累计抽卡{user.draw_count}次\n本期up尚未抽出"""
