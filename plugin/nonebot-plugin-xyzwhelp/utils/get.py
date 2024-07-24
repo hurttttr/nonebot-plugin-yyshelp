@@ -3,11 +3,14 @@ import re
 from io import BytesIO
 
 import requests
+import urllib3
 from nonebot import get_driver
 from PIL import Image
 
 from ..config import Config
 from .calculate import calculate
+
+urllib3.disable_warnings()
 
 config: Config = Config.parse_obj(get_driver().config)
 
@@ -64,8 +67,10 @@ def ocr_space_file(
     with open(filename, "rb") as f:
         r = requests.post(
             "https://api.ocr.space/parse/image",
+            headers={"Connection": "close"},
             files={filename: f},
             data=payload,
+            verify=False,
         )
     # 返回请求内容
     return r.content
