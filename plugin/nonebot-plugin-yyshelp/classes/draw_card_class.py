@@ -2,6 +2,10 @@ from pydantic import BaseModel
 
 
 class Heros:
+    heroid: int
+    name: str
+    rarity: str
+
     def __init__(self, heroid, name, rarity):
         self.heroid = heroid
         self.name = name

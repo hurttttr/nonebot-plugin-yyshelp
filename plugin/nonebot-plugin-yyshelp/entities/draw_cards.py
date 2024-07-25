@@ -1,18 +1,26 @@
 # 抽卡相关的命令
+import os
+from pathlib import Path
 from typing import List, Union
 
 from nonebot import on, on_command
 from nonebot.adapters import Message
-from nonebot.adapters.onebot.v11 import Bot, MessageEvent, PokeNotifyEvent
+from nonebot.adapters.onebot.v11 import (
+    Bot,
+    MessageEvent,
+    MessageSegment,
+    PokeNotifyEvent,
+)
 from nonebot.log import logger
 from nonebot.params import CommandArg
 from nonebot.permission import SUPERUSER
-from nonebot_plugin_saa import Text
+from nonebot_plugin_saa import Image, MessageFactory, Text
 
 from ..classes.draw_card_class import DrawCardUser, Heros
 from ..config import CONFIG_PATH, yyshelp_config
 from ..utils.config_load_save_help import load_config, save_config
 from ..utils.draw_card import (
+    generate_binary_image,
     generate_id_name_dict,
     get_or_update_icon,
     list_to_dict,
@@ -41,10 +49,23 @@ def draw_init():
     heros_dict = list_to_dict(heros_list)
     id_name_dict = generate_id_name_dict(heros_list)
     logger.info("抽卡模块加载成功")
-    if load_config(DrawCardUser, DRAW_PATH, user_list):
-        logger.info("加载用户数据成功")
-    else:
-        logger.info("加载用户数据失败")
+    # 判断用户数据文件是否存在，不存在创建,
+    if not os.path.exists(DRAW_PATH):
+        save_config(
+            DRAW_PATH,
+            [
+                DrawCardUser(
+                    user_id=12345678, group_id=12345678, up_count=0, draw_count=0
+                )
+            ],
+        )
+        logger.info("创建用户数据文件")
+        user_list = []
+    else:  # 存在则加载
+        if load_config(DrawCardUser, DRAW_PATH, user_list):
+            logger.info("加载用户数据成功")
+        else:
+            logger.info("加载用户数据失败，建议删除文件后重启")
 
 
 draw = on_command("抽卡", block=True)
@@ -66,22 +87,28 @@ async def _(event: Union[MessageEvent, PokeNotifyEvent]):
 
     result = simulate_draw(heros_dict, yyshelp_config.draw_card_up_id, user)
     user.draw_count += 10
-    # 将结果转换为字符串
-    result_str = ""
-    for hero_id in result:
-        hero_name = id_name_dict[hero_id][0]
-        hero_rarity = id_name_dict[hero_id][1]
-        result_str += f"{hero_rarity}:{hero_name} "
-
+    # # 将结果转换为字符串
+    # result_str = ""
+    # for hero_id in result:
+    #     hero_name = id_name_dict[hero_id][0]
+    #     hero_rarity = id_name_dict[hero_id][1]
+    #     result_str += f"{hero_rarity}:{hero_name} "
+    # 将结果转换为图片
+    result_image = generate_binary_image(result, id_name_dict)
+    # if user.get_up_count > 0:
+    #     send_text = f"""当期up：{id_name_dict[yyshelp_config.draw_card_up_id][0]}\n{
+    #         user.up_count}/60 内必出ssr/sp up已结束\n抽卡结果：\n{result_str}\n当前累计抽卡{user.draw_count}次"""
+    # else:
+    #     send_text = f"""当期up：{id_name_dict[yyshelp_config.draw_card_up_id][0]}\n{user.up_count}/60 内必出ssr/sp up概率：{10 + (
+    #         (user.draw_count-10)//50)*10}\n抽卡结果：\n{result_str}\n当前累计抽卡{user.draw_count}次"""
     if user.get_up_count > 0:
-        send_text = f"""当期up：{id_name_dict[yyshelp_config.draw_card_up_id][0]}\n{
-            user.up_count}/60 内必出ssr/sp up已结束\n抽卡结果：\n{result_str}\n当前累计抽卡{user.draw_count}次"""
+        send_text = f"当期up：{id_name_dict[yyshelp_config.draw_card_up_id][0]}\n{user.up_count}/60 内必出ssr/sp up已结束\n当前累计抽卡{user.draw_count}次\n抽卡结果：\n"
+
     else:
-        send_text = f"""当期up：{id_name_dict[yyshelp_config.draw_card_up_id][0]}\n{user.up_count}/60 内必出ssr/sp up概率：{10 + (
-            (user.draw_count-10)//50)*10}\n抽卡结果：\n{result_str}\n当前累计抽卡{user.draw_count}次"""
+        send_text = f"当期up：{id_name_dict[yyshelp_config.draw_card_up_id][0]}\n{user.up_count}/60 内必出ssr/sp up概率：{10 + ((user.draw_count-10)//50)*10}\n当前累计抽卡{user.draw_count}次\n抽卡结果：\n"
 
     # 发送结果,并@发送者
-    await Text(send_text).send(at_sender=True)
+    await draw.finish(MessageSegment.image(result_image), at_sender=True)
 
 
 @on_command("抽卡帮助", block=True).handle()

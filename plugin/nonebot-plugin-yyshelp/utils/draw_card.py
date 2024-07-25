@@ -1,9 +1,12 @@
 import json
 import os
 import random
+import time
+from pathlib import Path
 from typing import Dict, List, Tuple
 
 import requests
+from PIL import Image, ImageDraw, ImageFont
 
 from ..classes.draw_card_class import DrawCardUser, Heros
 
@@ -27,6 +30,8 @@ ban_list = [
     "301",
     "323",
 ]
+
+colors = {"sp": "#ff3a4d", "ssr": "#fdcc2f", "sr": "#ba29f1", "r": "#666666"}
 
 headers = {
     "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/87.0.4280.88 Safari/537.36"
@@ -175,6 +180,44 @@ def simulate_draw(heros_dict: dict, heros_up_id: str, user: DrawCardUser) -> lis
                 user.get_up_count = user.draw_count + i + 1
             result.append(heros_id)
     return result
+
+
+# 输入式神列表，返回二进制图片数据
+def generate_binary_image(
+    heros_list: list[str], id_name_dict: dict[int:[str, str]]
+) -> str:
+    """
+    生成二进制图片数据。
+
+    根据式神列表生成二进制图片数据。
+
+    :param heros_list: list, 包含式神对象的列表。
+    :return: str, 图片路径。
+    """
+    new_img = Image.new("RGBA", (620, 240))
+    draw = ImageDraw.Draw(new_img)
+    for index, heros in enumerate(heros_list):
+        # 读取式神图标
+        heros_rarity = id_name_dict[heros][1]
+        img = Image.open(path + f"{heros_rarity}/{heros}.png")
+        font = ImageFont.load_default(40)
+        # 计算坐标
+        if index < 5:
+            x, y = (10 + index * 120, 0)
+        else:
+            x, y = (10 + (index - 5) * 120, 120)
+        new_img.paste(img, (x, y))
+        draw.text(
+            (x, y + 80),
+            heros_rarity,
+            font=font,
+            fill=colors[heros_rarity],
+        )
+    # 生成时间戳
+    file_path = Path.cwd() / "temp" / f"{int(time.time())}.png"
+    new_img.save(file_path)
+    # 返回二进制数据
+    return file_path
 
 
 if __name__ == "__main__":

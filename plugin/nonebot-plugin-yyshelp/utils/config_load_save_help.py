@@ -35,12 +35,12 @@ def load_config(obj_type: type, file_path: str, data_list: list) -> bool:
         with open(file_path, "r", encoding="utf-8") as f:
             data = json.load(f)
     else:
-        logger.log("error", f"文件类型不支持")
+        logger.log("ERROR", f"文件类型不支持")
         return False
 
     # 判断yaml数据是否为空
     if not data:
-        logger.log("error", f"文件{file_path}数据为空")
+        logger.log("ERROR", f"文件{file_path}数据为空")
         return False
 
     # 遍历yaml数据，生成对象存入数据列表
@@ -64,7 +64,7 @@ def save_config(file_path: str, data_list: list) -> bool:
 
     # 判断数据列表是否为空
     if not data_list:
-        logger.log("error", f"文件{file_path}数据为空")
+        logger.log("ERROR", f"文件{file_path}数据为空")
         return False
     # 判断文件路径是否存在
     if not os.path.exists(os.path.dirname(file_path)):
@@ -94,7 +94,7 @@ def save_config(file_path: str, data_list: list) -> bool:
         with open(file_path, "a", encoding="utf-8") as f:
             json.dump(data, f, ensure_ascii=False)
     else:
-        logger.log("error", f"文件类型不支持")
+        logger.log("ERROR", f"文件类型不支持")
         return False
 
     return True
