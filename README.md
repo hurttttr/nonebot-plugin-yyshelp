@@ -60,7 +60,15 @@ pip install -r development.txt
 
 <details>
 <summary>点击展开</summary>
+
+### [2024/7/26] v1.1.1 今日老婆功能修正
+
+
+- 添加今日老婆插件
+- 按群友要求进行了部分修改
+
 ### [2024/7/3] v1.1.0 抽卡模块上线
+
 
 - 抽卡功能实现
 - 确定项目整体结构
@@ -70,3 +78,8 @@ pip install -r development.txt
 - 完善项目说明
 
 </details>
+
+### 🎉鸣谢
+
+感谢[nonebot-plugin-today-waifu](https://github.com/glamorgan9826/nonebot-plugin-today-waifu)项目的实现
+
