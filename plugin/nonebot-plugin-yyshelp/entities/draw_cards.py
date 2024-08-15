@@ -108,7 +108,7 @@ async def _(event: Union[MessageEvent, PokeNotifyEvent]):
         send_text = f"当期up：{id_name_dict[yyshelp_config.draw_card_up_id][0]}\n{user.up_count}/60 内必出ssr/sp up概率：{10 + ((user.draw_count-10)//50)*10}\n当前累计抽卡{user.draw_count}次\n抽卡结果：\n"
 
     # 发送结果,并@发送者
-    await draw.finish(MessageSegment.image(result_image), at_sender=True)
+    await MessageFactory([Text(send_text), Image(result_image)]).finish(at_sender=True)
 
 
 @on_command("抽卡帮助", block=True).handle()

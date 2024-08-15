@@ -2,6 +2,7 @@ import json
 import os
 import random
 import time
+from io import BytesIO
 from pathlib import Path
 from typing import Dict, List, Tuple
 
@@ -185,7 +186,7 @@ def simulate_draw(heros_dict: dict, heros_up_id: str, user: DrawCardUser) -> lis
 # 输入式神列表，返回二进制图片数据
 def generate_binary_image(
     heros_list: list[str], id_name_dict: dict[int:[str, str]]
-) -> str:
+) -> bytes:
     """
     生成二进制图片数据。
 
@@ -213,11 +214,9 @@ def generate_binary_image(
             font=font,
             fill=colors[heros_rarity],
         )
-    # 生成时间戳
-    file_path = Path.cwd() / "temp" / f"{int(time.time())}.png"
-    new_img.save(file_path)
-    # 返回二进制数据
-    return file_path
+    img_byte_arr = BytesIO()
+    new_img.save(img_byte_arr, format="PNG")
+    return img_byte_arr.getvalue()
 
 
 if __name__ == "__main__":

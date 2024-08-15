@@ -35,7 +35,8 @@ nb plugin install nonebot-plugin-autoreply nonebot-bison nonebot-plugin-send-any
   - [ ] 实现在线更新
 
 - [x] 模拟抽卡
-  - [ ] 抽卡图片生成
+  - [x] 抽卡图片生成
+  - [ ] 每周三定时查询更新
 - [ ] 寮三十查询
   - [ ] 完善cookie获取方式（希望有大佬帮助）
 
