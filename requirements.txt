@@ -6,4 +6,4 @@ nonebot_plugin_memes
 pydantic~=1.10
 openai>=1.0
 requests
-pillow
+pillow >=10.5
