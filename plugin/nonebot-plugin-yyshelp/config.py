@@ -37,7 +37,7 @@ class YYSHelpConfig(BaseModel):
 # 读取配置文件，若不存在则创建
 if not os.path.exists(CONFIG_PATH):
     save_config(CONFIG_PATH, [YYSHelpConfig()])
-templist = []
+templist: List[YYSHelpConfig] = []
 load_config(YYSHelpConfig, CONFIG_PATH, templist)
 yyshelp_config = templist[0]
 

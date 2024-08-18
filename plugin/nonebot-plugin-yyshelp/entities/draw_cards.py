@@ -3,7 +3,7 @@ import os
 from pathlib import Path
 from typing import List, Union
 
-from nonebot import on, on_command
+from nonebot import get_bot, get_driver, on_command
 from nonebot.adapters import Message
 from nonebot.adapters.onebot.v11 import (
     Bot,
@@ -14,7 +14,8 @@ from nonebot.adapters.onebot.v11 import (
 from nonebot.log import logger
 from nonebot.params import CommandArg
 from nonebot.permission import SUPERUSER
-from nonebot_plugin_saa import Image, MessageFactory, Text
+from nonebot_plugin_apscheduler import scheduler
+from nonebot_plugin_saa import Image, MessageFactory, TargetQQPrivate, Text
 
 from ..classes.draw_card_class import DrawCardUser, Heros
 from ..config import CONFIG_PATH, yyshelp_config
@@ -87,20 +88,8 @@ async def _(event: Union[MessageEvent, PokeNotifyEvent]):
 
     result = simulate_draw(heros_dict, yyshelp_config.draw_card_up_id, user)
     user.draw_count += 10
-    # # 将结果转换为字符串
-    # result_str = ""
-    # for hero_id in result:
-    #     hero_name = id_name_dict[hero_id][0]
-    #     hero_rarity = id_name_dict[hero_id][1]
-    #     result_str += f"{hero_rarity}:{hero_name} "
     # 将结果转换为图片
     result_image = generate_binary_image(result, id_name_dict)
-    # if user.get_up_count > 0:
-    #     send_text = f"""当期up：{id_name_dict[yyshelp_config.draw_card_up_id][0]}\n{
-    #         user.up_count}/60 内必出ssr/sp up已结束\n抽卡结果：\n{result_str}\n当前累计抽卡{user.draw_count}次"""
-    # else:
-    #     send_text = f"""当期up：{id_name_dict[yyshelp_config.draw_card_up_id][0]}\n{user.up_count}/60 内必出ssr/sp up概率：{10 + (
-    #         (user.draw_count-10)//50)*10}\n抽卡结果：\n{result_str}\n当前累计抽卡{user.draw_count}次"""
     if user.get_up_count > 0:
         send_text = f"当期up：{id_name_dict[yyshelp_config.draw_card_up_id][0]}\n{user.up_count}/60 内必出ssr/sp up已结束\n当前累计抽卡{user.draw_count}次\n抽卡结果：\n"
 
@@ -192,3 +181,41 @@ async def _(bot: Bot):
     group_list = await bot.get_group_list()
     for group in group_list:
         await bot.send_group_msg(group_id=group["group_id"], message=message)
+
+
+# 定时任务，每周3中午12点执行抽卡更新
+@scheduler.scheduled_job("cron", day_of_week=2, hour=12, id="update_draw_card")
+async def update_draw_card():
+    global heros_list, heros_dict, id_name_dict, user_list
+    heros_list, update_text = get_or_update_icon()
+    heros_dict = list_to_dict(heros_list)
+    id_name_dict = generate_id_name_dict(heros_list)
+    bot: Bot = get_bot()
+    if len(update_text) == 0:
+        try:
+            for user in get_driver().config.superusers:
+                await Text("无式神更新").send_to(
+                    target=TargetQQPrivate(user_id=user), bot=bot
+                )
+        except:
+            logger.error("[draw_card]:定时任务发送失败,请配置超级管理员账号")
+    else:
+        heros_list.sort(key=lambda x: x.heroid, reverse=True)
+        yyshelp_config.draw_card_up_id = heros_list[0].heroid
+        # 重置抽卡记录
+        for user in user_list:
+            user.up_count = 0
+            user.draw_count = 0
+            user.get_up_count = 0
+        # 保存抽卡记录
+        save_config(CONFIG_PATH, [yyshelp_config])
+        update_text = f"""更新式神\n{update_text}\n当前up：{id_name_dict[yyshelp_config.draw_card_up_id][0]}\n已重置抽卡次数"""
+        # 发送更新信息
+        try:
+            for user in get_driver().config.superusers:
+                bot.send_private_msg(user_id=user, message=update_text)
+        except:
+            logger.error("[draw_card]:定时任务发送失败,请配置超级管理员账号")
+        group_list = await bot.get_group_list()
+        for group in group_list:
+            await bot.send_group_msg(group_id=group["group_id"], message=update_text)
