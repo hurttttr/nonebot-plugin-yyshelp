@@ -202,7 +202,7 @@ def generate_binary_image(
         # 读取式神图标
         heros_rarity = id_name_dict[heros][1]
         img = Image.open(path + f"{heros_rarity}/{heros}.png")
-        font = ImageFont.truetype(resource_config.font_path, 40)
+        font = ImageFont.truetype(str(resource_config.font_path), 40)
         # 计算坐标
         if index < 5:
             x, y = (10 + index * 120, 0)
