@@ -53,7 +53,13 @@ class ConfigModel(BaseModel):
     autoreply_priority: int = 99
 
 
+class PluginConfig(BaseModel):
+    resource_path: Path = Path(__file__).parent / "resource"
+    font_path: Path = resource_path / "fonts" / "arial.ttf"
+
+
 config = ConfigModel.parse_obj(get_driver().config)
+resource_config: PluginConfig = PluginConfig.parse_obj(get_driver().config.dict())
 
 
 class ReplyEntryModel(BaseModel):
