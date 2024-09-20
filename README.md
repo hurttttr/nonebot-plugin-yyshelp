@@ -28,6 +28,21 @@ fc-cache -f -v #刷新缓存
 
 #反向ws地址
 ws://127.0.0.1:5701/onebot/v11/ws
+#抽签功能使用git clone安装，并修改utils.py,或者将pillow降级到9.1.0版本，推荐进行代码修改
+ttfront = ImageFont.truetype(fontPath["title"], font_size)
+#font_length = ttfront.getsize(title)
+font_length = ttfront.getbbox(title)
+draw.text(
+    (
+        #image_font_center[0] - font_length[0] / 2,
+        #image_font_center[1] - font_length[1] / 2,
+        image_font_center[0] - (font_length[2] - font_length[0]) / 2,
+        image_font_center[1] - (font_length[3] - font_length[1]) / 2,
+    ),
+    title,
+    fill=color,
+    font=ttfront,
+)
 ```
 
 > 附带的咸鱼之王插件需配置中添加`xyzwhelp_apikey`在ocr.space自行申请，如果使用其他api自行 修改`utils/get.py`文件中的`ocr_space_file`函数
