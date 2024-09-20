@@ -13,12 +13,21 @@
 >
 > 部分插件的安装步骤和使用请参考插件原文档
 
-```
-nb plugin install nonebot-plugin-autoreply nonebot-bison nonebot-plugin-send-anything-anywhere nonebot-plugin-naturel-gpt  nonebot_plugin_memes 
+```shell
+nb plugin install nonebot-plugin-autoreply nonebot-bison nonebot-plugin-send-anything-anywhere nonebot_plugin_memes 
+#nonebot-plugin-naturel-gpt 考虑升级至nekro-agent
 .venv/bin/python -m pip install httpx[socks] requests[socks]
 .venv/bin/python -m pip install --force-reinstall 'pydantic~=1.10' #降级
 .venv/bin/python -m pip install --upgrade 'openai>=1.0' #升级
 .venv/bin/python -m pip install requests pillow
+
+# nonebot_plugin_memes安装依赖
+sudo apt install fonts-noto-cjk fonts-noto-color-emoji
+#上传字体文件到 /usr/share/fonts
+fc-cache -f -v #刷新缓存
+
+#反向ws地址
+ws://127.0.0.1:5701/onebot/v11/ws
 ```
 
 > 附带的咸鱼之王插件需配置中添加`xyzwhelp_apikey`在ocr.space自行申请，如果使用其他api自行 修改`utils/get.py`文件中的`ocr_space_file`函数
@@ -36,7 +45,7 @@ nb plugin install nonebot-plugin-autoreply nonebot-bison nonebot-plugin-send-any
 
 - [x] 模拟抽卡
   - [x] 抽卡图片生成
-  - [ ] 每周三定时查询更新
+  - [x] 每周三定时查询更新
 - [ ] 寮三十查询
   - [ ] 完善cookie获取方式（希望有大佬帮助）
 
