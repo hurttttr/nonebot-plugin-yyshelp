@@ -12,6 +12,7 @@ class Config(BaseModel, extra=Extra.ignore):
     today_waifu_change_aliases: List[str] = ['换老婆', "换老公"]
     today_waifu_record_dir: Path = Path(__file__).parent / 'record'
     today_waifu_superuser_opt: bool = False
+    today_waifu_blacklist: List[int] = []
 
     @validator('today_waifu_record_dir', pre=True)
     def check_path(cls, v) -> Path:
@@ -26,5 +27,5 @@ class Config(BaseModel, extra=Extra.ignore):
     @validator('today_waifu_aliases', pre=True)
     def check_aliases(cls, v: List[str]) -> List[str]:
         if not isinstance(v, list):
-            return ['每日老婆', ]
-        return list(set(map(str, v + ['每日老婆', ])))
+            return ['每日老婆', "每日老公", ]
+        return list(set(map(str, v + ['每日老婆', "每日老公", ])))

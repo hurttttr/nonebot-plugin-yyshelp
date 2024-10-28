@@ -61,6 +61,7 @@ ban_id: Set[int] = waifu_config.today_waifu_ban_id_list
 default_allow_change_waifu: bool = waifu_config.today_waifu_default_change_waifu
 default_limit_times: int = waifu_config.today_waifu_default_limit_times
 today_waifu_superuser_opt: bool = waifu_config.today_waifu_superuser_opt
+blacklist :List[int]= waifu_config.today_waifu_blacklist
 if today_waifu_superuser_opt:
     permission_opt = SUPERUSER
 else:
@@ -115,6 +116,9 @@ today_waifu_set_allow_change = on_regex(
 @today_waifu_set_allow_change.handle()
 async def _(event: GroupMessageEvent, val: Dict[str, Any] = RegexDict()):
     gid = str(event.group_id)
+    if gid in blacklist:
+        await today_waifu_set_allow_change.finish('本群在黑名单中，请联系管理员')
+        return
     group_record: Dict[str, Union[bool, Dict[str, Dict[str, int]]]] = get_group_record(gid)  # 获取本群记录字典
     val: str = val.get('val', '').strip()
     if val == '开启换老婆':
@@ -129,6 +133,10 @@ async def _(event: GroupMessageEvent, val: Dict[str, Any] = RegexDict()):
 
 @today_waifu_set_limit_times.handle()
 async def _(event: GroupMessageEvent, times: Dict[str, Any] = RegexDict()):
+    gid = str(event.group_id)
+    if gid in blacklist:
+        await today_waifu_set_allow_change.finish('本群在黑名单中，请联系管理员')
+        return
     limit_times: str = times.get('times', str(default_limit_times)).strip()
     try:
         limit_times_num = int(limit_times)
@@ -145,6 +153,9 @@ async def _(event: GroupMessageEvent, times: Dict[str, Any] = RegexDict()):
 @today_waifu_change.handle()
 async def _(bot: Bot, event: GroupMessageEvent):
     gid = str(event.group_id)
+    if gid in blacklist:
+        await today_waifu_set_allow_change.finish('本群在黑名单中，请联系管理员')
+        return
     uid = str(event.user_id)
     today = str(datetime.date.today())
     group_record: Dict[str, Union[int, bool, Dict[str, Dict[str, int]]]] = get_group_record(gid)  # 获取本群记录字典
@@ -199,6 +210,9 @@ async def _(bot: Bot, event: GroupMessageEvent):
 @today_waifu.handle()
 async def _(bot: Bot, event: GroupMessageEvent):
     gid = str(event.group_id)
+    if gid in blacklist:
+        await today_waifu_set_allow_change.finish('本群在黑名单中，请联系管理员')
+        return
     uid = str(event.user_id)
     today = str(datetime.date.today())
     group_record: Dict[str, Union[int, bool, Dict[str, Dict[str, int]]]] = get_group_record(gid)  # 获取本群记录字典
@@ -250,6 +264,10 @@ async def _(bot: Bot, event: GroupMessageEvent):
 
 @today_waifu_refresh.handle()
 async def _(event: GroupMessageEvent, name: Dict[str, Any] = RegexDict()):
+    gid = str(event.group_id)
+    if gid in blacklist:
+        await today_waifu_set_allow_change.finish('本群在黑名单中，请联系管理员')
+        return
     plugin_name: str = name.get('name', __plugin_name__).strip()
     clear_group_record(str(event.group_id))
     await today_waifu_refresh.finish(f"{plugin_name}已刷新！")
