@@ -61,7 +61,7 @@ ban_id: Set[int] = waifu_config.today_waifu_ban_id_list
 default_allow_change_waifu: bool = waifu_config.today_waifu_default_change_waifu
 default_limit_times: int = waifu_config.today_waifu_default_limit_times
 today_waifu_superuser_opt: bool = waifu_config.today_waifu_superuser_opt
-blacklist :List[int]= waifu_config.today_waifu_blacklist
+blacklist :Set[str]= waifu_config.today_waifu_blacklist
 if today_waifu_superuser_opt:
     permission_opt = SUPERUSER
 else:
@@ -210,6 +210,7 @@ async def _(bot: Bot, event: GroupMessageEvent):
 @today_waifu.handle()
 async def _(bot: Bot, event: GroupMessageEvent):
     gid = str(event.group_id)
+    print(gid,blacklist)
     if gid in blacklist:
         await today_waifu_set_allow_change.finish('本群在黑名单中，请联系管理员')
         return
