@@ -7,6 +7,7 @@ from nonebot import get_bot, get_driver, on_command
 from nonebot.adapters import Message
 from nonebot.adapters.onebot.v11 import (
     Bot,
+    Event,
     MessageEvent,
     MessageSegment,
     PokeNotifyEvent,
@@ -39,6 +40,18 @@ up_count = 0
 user_list: List[DrawCardUser] = []
 
 
+async def is_group_blacklisted(event: Event) -> bool:
+    """
+    黑名单功能，判断群号是否在黑名单中
+    """
+    if (
+        event.get_type() == "group"
+        and event.group_id in yyshelp_config.draw_card_black_groups
+    ):
+        return False
+    return True
+
+
 def draw_init():
     logger.info("抽卡模块加载")
     global heros_list, heros_dict, id_name_dict, user_list
@@ -69,13 +82,16 @@ def draw_init():
             logger.info("加载用户数据失败，建议删除文件后重启")
 
 
-draw = on_command("抽卡", block=True)
+draw = on_command("抽卡", rules=is_group_blacklisted, block=True)
 
 
 @draw.handle()
 async def _(event: Union[MessageEvent, PokeNotifyEvent]):
     # 判断群号是否在黑名单中
-    if event.get_type() == "group" and event.group_id in [12345678, 987654321]:
+    if (
+        event.get_type() == "group"
+        and event.group_id in yyshelp_config.draw_card_black_groups
+    ):
         return
     # 判断是否存在抽卡记录
     if event.user_id in user_list:
@@ -100,7 +116,7 @@ async def _(event: Union[MessageEvent, PokeNotifyEvent]):
     await MessageFactory([Text(send_text), Image(result_image)]).finish(at_sender=True)
 
 
-@on_command("抽卡帮助", block=True).handle()
+@on_command("抽卡帮助", rules=is_group_blacklisted, block=True).handle()
 async def _(event: Union[MessageEvent, PokeNotifyEvent]):
     await Text(
         """抽卡帮助：
@@ -112,7 +128,7 @@ async def _(event: Union[MessageEvent, PokeNotifyEvent]):
     ).send()
 
 
-@on_command("抽卡记录", block=True).handle()
+@on_command("抽卡记录", rules=is_group_blacklisted, block=True).handle()
 async def _(event: Union[MessageEvent, PokeNotifyEvent]):
     # 判断是否存在抽卡记录
     if event.user_id in user_list:
