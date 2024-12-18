@@ -82,16 +82,13 @@ def draw_init():
             logger.info("加载用户数据失败，建议删除文件后重启")
 
 
-draw = on_command("抽卡", rules=is_group_blacklisted, block=True)
+draw = on_command("抽卡", rule=is_group_blacklisted, block=True)
 
 
 @draw.handle()
 async def _(event: Union[MessageEvent, PokeNotifyEvent]):
     # 判断群号是否在黑名单中
-    if (
-        event.get_type() == "group"
-        and event.group_id in yyshelp_config.draw_card_black_groups
-    ):
+    if event.get_type() == "group":
         return
     # 判断是否存在抽卡记录
     if event.user_id in user_list:
@@ -116,7 +113,7 @@ async def _(event: Union[MessageEvent, PokeNotifyEvent]):
     await MessageFactory([Text(send_text), Image(result_image)]).finish(at_sender=True)
 
 
-@on_command("抽卡帮助", rules=is_group_blacklisted, block=True).handle()
+@on_command("抽卡帮助", rule=is_group_blacklisted, block=True).handle()
 async def _(event: Union[MessageEvent, PokeNotifyEvent]):
     await Text(
         """抽卡帮助：
@@ -128,7 +125,7 @@ async def _(event: Union[MessageEvent, PokeNotifyEvent]):
     ).send()
 
 
-@on_command("抽卡记录", rules=is_group_blacklisted, block=True).handle()
+@on_command("抽卡记录", rule=is_group_blacklisted, block=True).handle()
 async def _(event: Union[MessageEvent, PokeNotifyEvent]):
     # 判断是否存在抽卡记录
     if event.user_id in user_list:
@@ -234,4 +231,7 @@ async def update_draw_card():
             logger.error("[draw_card]:定时任务发送失败,请配置超级管理员账号")
         group_list = await bot.get_group_list()
         for group in group_list:
-            await bot.send_group_msg(group_id=group["group_id"], message=update_text)
+            if group not in yyshelp_config.draw_card_black_groups:
+                await bot.send_group_msg(
+                    group_id=group["group_id"], message=update_text
+                )
