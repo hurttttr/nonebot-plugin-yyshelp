@@ -1,0 +1,11 @@
+PUSH_ON: true #推送开关
+PUSH_TIME: 8  #推送时间
+PUSH_CONTROL: #推送控制
+	GROUP: #群控制
+        TYPE: "white" #black黑名单，white白名单，默认白名单有需要自行修改
+        GROUP_ID:
+            - 12345
+            - 45567
+    USER: #私聊控制
+    	- 12345
+    	- 1234

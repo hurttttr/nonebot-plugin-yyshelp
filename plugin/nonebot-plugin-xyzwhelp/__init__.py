@@ -1,7 +1,9 @@
+from __future__ import annotations
+
 from nonebot import get_driver
-from nonebot.plugin import PluginMetadata
 from nonebot.config import Config
 from nonebot.log import logger
+from nonebot.plugin import PluginMetadata
 
 from . import __main__ as __main__
 

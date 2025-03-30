@@ -1,10 +1,8 @@
 import json
 import os
 import random
-import time
 from io import BytesIO
-from pathlib import Path
-from typing import Dict, List, Tuple
+from typing import Dict, Tuple
 
 import requests
 from PIL import Image, ImageDraw, ImageFont

@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 import json
 import os
 from pathlib import Path
@@ -24,6 +26,7 @@ class YYSHelpConfig(BaseModel):
 
     Args:
         BaseModel (_type_): _description_
+
     """
 
     # 以下为配置项
@@ -47,6 +50,7 @@ class ConfigModel(BaseModel):
 
     Args:
         BaseModel (_type_): _description_
+
     """
 
     autoreply_block: bool = False
@@ -107,6 +111,7 @@ def iter_config_path(root_path: Path = DATA_PATH) -> Iterator[Path]:
 
     Yields:
         Iterator[Path]: 返回的是一个迭代器，迭代器的元素是 Path 类型的对象，表示文件路径
+
     """
     for path in root_path.iterdir():
         if path.is_dir():
@@ -124,6 +129,7 @@ def load_rss_config(path: Path) -> List[ReplyEntryModel]:
 
     Returns:
         List[ReplyEntryModel]: 返回的是一个列表，列表的元素是 ReplyEntryModel 类型的对象
+
     """
     content = path.read_text(encoding="u8")
 
@@ -152,7 +158,7 @@ def reload_rss() -> Tuple[int, int]:
 
     else:
         logger.opt(colors=True).info(
-            f"加载回复配置 <y>{file_name}</y> <l><g>成功</g></l>"
+            f"加载回复配置 <y>{file_name}</y> <l><g>成功</g></l>",
         )
         success += 1
 
@@ -164,8 +170,7 @@ def reload_rss() -> Tuple[int, int]:
 
 
 def reload_dailywork() -> bool:
-    """
-    重新加载每日工作配置。
+    """重新加载每日工作配置。
 
     从指定的文件（支持 YAML 或 JSON 格式）中读取每日工作配置，并更新到 dailywork 的存储中。
     不接受任何参数。
@@ -186,10 +191,10 @@ def reload_dailywork() -> bool:
             obj: list = json.loads(content)
         # 将加载的内容转换为 DailyWorkModel 实例，并更新到 dailywork 中
         dailywork.extend([DailyWorkModel(**x) for x in obj])
-        logger.opt(colors=True).info(f"<g>加载日常任务配置完毕</g>")
+        logger.opt(colors=True).info("<g>加载日常任务配置完毕</g>")
     except Exception:
         # 记录加载异常
-        logger.opt(colors=True).exception(f"<r>加载日常任务配置失败</r>")
+        logger.opt(colors=True).exception("<r>加载日常任务配置失败</r>")
         return False
     return True
 

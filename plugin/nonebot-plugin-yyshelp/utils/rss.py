@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 import re
 import xml.etree.ElementTree as ET
 from datetime import datetime
@@ -31,7 +33,7 @@ async def get_rssdataList(
     Returns:
         dict: 数据字典
     """
-    root = ET.fromstring(requests.get(url=url).text)
+    root = ET.fromstring(requests.get(url=url, timeout=10).text)
     author = root[0][0].text
     get_rssdataList = []
     for elem in root[0].iter(tag="item"):  # 获取rss中item的内容

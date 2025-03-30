@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 import nonebot.adapters
 from nonebot import get_driver
 from nonebot.plugin import PluginMetadata, require

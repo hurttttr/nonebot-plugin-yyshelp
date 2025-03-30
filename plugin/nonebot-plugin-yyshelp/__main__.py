@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from typing import List, Union
 
 from nonebot import on_command, on_message, on_notice, require
@@ -31,14 +33,13 @@ from .config import (
     reload_rss,
     replies,
 )
-from .utils.dailywork import not_do_liao30, not_do_weekly
 from .utils.rss import RssData, get_rssdataList
 
 require("nonebot_plugin_saa")
 require("nonebot_plugin_apscheduler")
 
 
-def match_str(word: str, match_list: List[str]) -> bool:
+def match_str(word: str, match_list: list[str]) -> bool:
     if not word or not match_list:
         return False
     match_set = set(match_list)
@@ -46,7 +47,7 @@ def match_str(word: str, match_list: List[str]) -> bool:
 
 
 async def message_checker(
-    event: Union[MessageEvent, PokeNotifyEvent],
+    event: MessageEvent | PokeNotifyEvent,
     state: T_State,
 ) -> bool:
 
@@ -54,7 +55,7 @@ async def message_checker(
     for reply in replies:
         if match_str(str(event.get_message()), reply.matches):  # 进行回复词匹配
             state_reply.append(
-                await get_rssdataList(reply.user, reply.keyword, reply.number)
+                await get_rssdataList(reply.user, reply.keyword, reply.number),
             )
             break
 
@@ -76,7 +77,7 @@ poke_matcher = on_notice(
 
 @message_matcher.handle()
 @poke_matcher.handle()
-async def _(bot: Bot, event: Union[MessageEvent, PokeNotifyEvent], state: T_State):
+async def _(bot: Bot, event: MessageEvent | PokeNotifyEvent, state: T_State):
     """
     异步处理函数，用于根据会话状态回复信息。
 
@@ -89,7 +90,7 @@ async def _(bot: Bot, event: Union[MessageEvent, PokeNotifyEvent], state: T_Stat
     """
 
     # 从会话状态中获取待回复的数据
-    reply: List[RssData] = state["reply"][0]
+    reply: list[RssData] = state["reply"][0]
 
     if len(reply) == 0:  # 如果待回复数据为空，则发送未查询到相关记录的消息
         await Text("未查询到相关记录！").finish()
@@ -110,7 +111,7 @@ async def _(bot: Bot, event: Union[MessageEvent, PokeNotifyEvent], state: T_Stat
         for i in reply:
             # 对每条数据，创建包含文本和图片的消息工厂对象
             msg_list.append(
-                MessageFactory([Text(format(i))] + [Image(j) for j in i.src_links])
+                MessageFactory([Text(format(i))] + [Image(j) for j in i.src_links]),
             )
         await AggregatedMessageFactory(msg_list).finish()
 
@@ -131,11 +132,12 @@ broadcast = on_command("广播", aliases={"bc"}, permission=SUPERUSER)
 
 
 @broadcast.handle()
-async def _(bot: Bot,event: PrivateMessageEvent,arg: Message = CommandArg()) -> None:
+async def _(bot: Bot, event: PrivateMessageEvent, arg: Message = CommandArg()) -> None:
     msg = arg.extract_plain_text().strip()
     if not msg:
         await bot.send_private_msg(
-            user_id=event.user_id, message="请在指令后接需要广播的消息"
+            user_id=event.user_id,
+            message="请在指令后接需要广播的消息",
         )
     group_list = await bot.get_group_list()
     for group in group_list:

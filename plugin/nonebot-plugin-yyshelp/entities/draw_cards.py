@@ -1,6 +1,7 @@
 # 抽卡相关的命令
+from __future__ import annotations
+
 import os
-from pathlib import Path
 from typing import List, Union
 
 from nonebot import get_bot, get_driver, on_command
@@ -9,7 +10,6 @@ from nonebot.adapters.onebot.v11 import (
     Bot,
     Event,
     MessageEvent,
-    MessageSegment,
     PokeNotifyEvent,
 )
 from nonebot.log import logger
@@ -69,17 +69,19 @@ def draw_init():
             DRAW_PATH,
             [
                 DrawCardUser(
-                    user_id=12345678, group_id=12345678, up_count=0, draw_count=0
-                )
+                    user_id=12345678,
+                    group_id=12345678,
+                    up_count=0,
+                    draw_count=0,
+                ),
             ],
         )
         logger.info("创建用户数据文件")
         user_list = []
-    else:  # 存在则加载
-        if load_config(DrawCardUser, DRAW_PATH, user_list):
-            logger.info("加载用户数据成功")
-        else:
-            logger.info("加载用户数据失败，建议删除文件后重启")
+    elif load_config(DrawCardUser, DRAW_PATH, user_list):
+        logger.info("加载用户数据成功")
+    else:
+        logger.info("加载用户数据失败，建议删除文件后重启")
 
 
 draw = on_command("抽卡", rule=is_group_blacklisted, block=True)
@@ -95,7 +97,10 @@ async def _(event: Union[MessageEvent, PokeNotifyEvent]):
         user = user_list[user_list.index(event.user_id)]
     else:
         user = DrawCardUser(
-            user_id=event.user_id, group_id=event.group_id, up_count=0, draw_count=0
+            user_id=event.user_id,
+            group_id=event.group_id,
+            up_count=0,
+            draw_count=0,
         )
         user_list.append(user)
 
@@ -117,11 +122,11 @@ async def _(event: Union[MessageEvent, PokeNotifyEvent]):
 async def _(event: Union[MessageEvent, PokeNotifyEvent]):
     await Text(
         """抽卡帮助：
-1. 发送“抽卡”命令，即可进行十连抽卡。         
+1. 发送“抽卡”命令，即可进行十连抽卡。
 2. 累计抽卡次数达到60次后，必得ssr/sp。
 3. 当期up初始概率为10%，每抽50次增加10%概率，抽出后概率加成消失。
 4. 每次抽卡up维持12天
-5. 依照官方公布概率 r:78.25% sr:10% ssr:1% sp:0.25%"""
+5. 依照官方公布概率 r:78.25% sr:10% ssr:1% sp:0.25%""",
     ).send()
 
 
@@ -208,7 +213,8 @@ async def update_draw_card():
         try:
             for user in get_driver().config.superusers:
                 await Text("无式神更新").send_to(
-                    target=TargetQQPrivate(user_id=user), bot=bot
+                    target=TargetQQPrivate(user_id=user),
+                    bot=bot,
                 )
         except:
             logger.error("[draw_card]:定时任务发送失败,请配置超级管理员账号")
@@ -233,5 +239,6 @@ async def update_draw_card():
         for group in group_list:
             if group not in yyshelp_config.draw_card_black_groups:
                 await bot.send_group_msg(
-                    group_id=group["group_id"], message=update_text
+                    group_id=group["group_id"],
+                    message=update_text,
                 )
