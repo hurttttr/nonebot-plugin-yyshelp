@@ -21,15 +21,10 @@ from nonebot_plugin_saa import (
     AggregatedMessageFactory,
     Image,
     MessageFactory,
-    TargetQQGroup,
     Text,
 )
 
 from .config import (
-    DailyWorkModel,
-    config,
-    dailywork,
-    reload_dailywork,
     reload_rss,
     replies,
 )
@@ -65,13 +60,13 @@ async def message_checker(
 
 message_matcher = on_message(
     rule=message_checker,
-    block=config.autoreply_block,
-    priority=config.autoreply_priority,
+    block=False,
+    priority=99,
 )
 poke_matcher = on_notice(
     rule=message_checker,
-    block=config.autoreply_block,
-    priority=config.autoreply_priority,
+    block=False,
+    priority=99,
 )
 
 

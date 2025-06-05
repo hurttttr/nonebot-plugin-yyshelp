@@ -6,7 +6,6 @@ from pathlib import Path
 from typing import Iterator, List, Literal, Tuple
 
 import yaml
-from nonebot import get_driver
 from nonebot.log import logger
 from pydantic import BaseModel
 
@@ -62,10 +61,6 @@ class PluginConfig(BaseModel):
     font_path: Path = resource_path / "fonts" / "arial.ttf"
 
 
-config = ConfigModel.parse_obj(get_driver().config)
-resource_config: PluginConfig = PluginConfig.parse_obj(get_driver().config.dict())
-
-
 class ReplyEntryModel(BaseModel):
     type: Literal["rss", "bilibili"] = "rss"
     priority: int = 1
@@ -74,33 +69,6 @@ class ReplyEntryModel(BaseModel):
     number: int = 5
     user: str
     option: List[Literal["bvinfo"]] = [""]  # 暂不使用
-
-
-class DailyWorkModel(BaseModel):
-    deviceid: str  # cookie
-    token: str  # cookie
-    uid: str  # 大神id
-    roleId: str  # 登录账户id
-    server: str  # 服务器id
-    guildId: str  # 寮id
-    cron: str = "0 0 21 * * 5 "  # 默认每周521点执行
-    at: bool = False
-    user_json: str = ""  # json对应文件路径
-    qh: int
-
-    def get_headers(self) -> dict[str, str]:
-        return {
-            "User-Agent": "Mozilla/5.0 (Linux; Android 12; 22021211RC Build/V417IR; wv) AppleWebKit/537.36 (KHTML, like Gecko) Version/4.0 Chrome/91.0.4472.114 Mobile Safari/537.36 Godlike/3.71.2 UEPay/com.netease.gl/android7.11.4",
-            "Accept": "application/json, text/plain, */*",
-            # 'Accept-Encoding': 'gzip, deflate',
-            "Content-Type": "application/json",
-            "gl-version": "3.71.2",
-            "gl-source": "URS",
-            "gl-deviceid": self.deviceid,
-            "gl-token": self.token,
-            "gl-clienttype": "50",
-            "gl-uid": self.uid,
-        }
 
 
 def iter_config_path(root_path: Path = DATA_PATH) -> Iterator[Path]:
@@ -169,37 +137,5 @@ def reload_rss() -> Tuple[int, int]:
     return success, fail
 
 
-def reload_dailywork() -> bool:
-    """重新加载每日工作配置。
-
-    从指定的文件（支持 YAML 或 JSON 格式）中读取每日工作配置，并更新到 dailywork 的存储中。
-    不接受任何参数。
-    返回值为 None。
-    """
-    dailywork.clear()  # 清空当前的每日工作记录
-    file_name = DATA_PATH / "dailywork.yaml"
-    print(file_name)  # 打印文件名
-
-    try:
-        content = file_name.read_text(encoding="u8")  # 读取文件内容
-
-        if file_name.suffix in (".yml", ".yaml"):  # 判断文件格式
-            # 加载 YAML 格式的内容
-            obj: list = yaml.load(content, Loader=yaml.FullLoader)
-        else:
-            # 加载 JSON 格式的内容
-            obj: list = json.loads(content)
-        # 将加载的内容转换为 DailyWorkModel 实例，并更新到 dailywork 中
-        dailywork.extend([DailyWorkModel(**x) for x in obj])
-        logger.opt(colors=True).info("<g>加载日常任务配置完毕</g>")
-    except Exception:
-        # 记录加载异常
-        logger.opt(colors=True).exception("<r>加载日常任务配置失败</r>")
-        return False
-    return True
-
-
-dailywork: List[DailyWorkModel] = []
 replies: List[ReplyEntryModel] = []
 reload_rss()
-reload_dailywork()

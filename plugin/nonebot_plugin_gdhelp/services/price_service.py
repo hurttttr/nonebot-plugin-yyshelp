@@ -6,8 +6,7 @@ from datetime import datetime, timedelta
 from typing import Dict, List
 
 import requests
-
-from ..entities.item import Item
+from schemas import Item
 
 
 def get_price_data(item_name: str) -> dict:

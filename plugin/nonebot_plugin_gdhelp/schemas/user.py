@@ -29,7 +29,10 @@ class Record:
     sold: float
     time: datetime
     type: str
-    group: int = None
+    group: int
+
+    def __str__(self):
+        return f"商品名称：{self.name} 购买价格：{self.price}\n最高卖出价格： {self.sold}\n添加时间：{self.time}\n添加方式：{self.type} {self.group}\n"
 
 
 @dataclass
@@ -38,9 +41,21 @@ class User:
     用户数据类
 
     Attributes:
-        user (int): QQ号
+        user (str): QQ号
         record (List[Record]): 用户的挂刀记录列表
     """
 
-    user: int
+    user: str
     record: list[Record]
+
+    def add_record(self, record: Record) -> None:
+        """
+        添加挂刀记录
+        Args:
+            record (Record): 挂刀记录
+        """
+        # 遍历recorde列表，如果有相同的记录，则不添加
+        for r in self.record:
+            if r.name == record.name and r.price == record.price:
+                return
+        self.record.append(record)
